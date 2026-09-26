@@ -1,0 +1,127 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  guards:
+    name: guards
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Forbidden words
+        env:
+          FORBIDDEN_WORDS: ${{ secrets.FORBIDDEN_WORDS }}
+        run: |
+          test -n "$FORBIDDEN_WORDS" || { echo "::error::FORBIDDEN_WORDS secret is missing"; exit 1; }
+          # -l prints only file names, so the log never reveals the forbidden word.
+          if git grep -I -i -l -E "$FORBIDDEN_WORDS"; then
+            echo "::error::A forbidden word was found in the files listed above"; exit 1
+          fi
+      - name: Key patterns
+        run: |
+          if git grep -I -n -E '(pub|prv)_(test|prod|stag[a-z]*)_[A-Za-z0-9]+|_(integrity|events)_[A-Za-z0-9]{10,}'; then
+            echo "::error::Something that looks like a payment gateway key was committed"; exit 1
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Formatting
+        run: npm run format:check
+      - name: Commit messages
+        if: github.event_name == 'pull_request'
+        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
+
+  api:
+    name: api
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint -w apps/api
+      - run: npm run typecheck -w apps/api
+      - run: npm run depcruise -w apps/api
+      - name: Tests with coverage (unit, integration with Testcontainers, e2e)
+        run: npm test -w apps/api
+      - name: Coverage summary
+        if: always()
+        run: node .github/scripts/coverage-summary.mjs apps/api/coverage/coverage-summary.json "API" >> "$GITHUB_STEP_SUMMARY"
+      - run: npm run build -w apps/api
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-coverage
+          path: apps/api/coverage
+          retention-days: 7
+
+  web:
+    name: web
+    runs-on: ubuntu-latest
+    env:
+      VITE_API_BASE_URL: /api
+      VITE_PG_BASE_URL: https://gateway.example/v1
+      VITE_PG_PUBLIC_KEY: ci-public-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint -w apps/web
+      - run: npm run stylelint -w apps/web
+      - run: npm run typecheck -w apps/web
+      - run: npm test -w apps/web
+      - name: Coverage summary
+        if: always()
+        run: node .github/scripts/coverage-summary.mjs apps/web/coverage/coverage-summary.json "Web" >> "$GITHUB_STEP_SUMMARY"
+      - run: npm run build -w apps/web
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: web-coverage
+          path: apps/web/coverage
+          retention-days: 7
+
+  infra:
+    name: infra
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint -w infra
+      - run: npm run typecheck -w infra
+      - run: npm test -w infra
+      - name: Coverage summary
+        if: always()
+        run: node .github/scripts/coverage-summary.mjs infra/coverage/coverage-summary.json "Infra" >> "$GITHUB_STEP_SUMMARY"
+
+  audit:
+    name: audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Production dependencies without high vulnerabilities
+        run: npm audit --omit=dev --audit-level=high
