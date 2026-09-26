@@ -1,9 +1,14 @@
+import { Suspense } from 'react';
 import { Link, Outlet, ScrollRestoration } from 'react-router';
+import { useIdlePreload } from '@/shared/hooks/useIdlePreload';
 import { es } from '@/shared/i18n/es';
+import { Spinner } from '@/shared/ui/Spinner';
 import styles from './App.module.css';
+import { preloadDeferredChunks } from './lazy-pages';
 
 /** Layout shared by every route: skip link, header, main landmark and sandbox notice. */
 export function AppLayout() {
+  useIdlePreload(preloadDeferredChunks);
   return (
     <div className={styles.shell}>
       <a className={styles.skipLink} href="#main-content">
@@ -19,7 +24,10 @@ export function AppLayout() {
         </Link>
       </header>
       <main className={styles.main} id="main-content" tabIndex={-1}>
-        <Outlet />
+        {/* Only a deep link waits here: navigations keep the current page until the chunk is in. */}
+        <Suspense fallback={<Spinner label={es.app.loading} showLabel />}>
+          <Outlet />
+        </Suspense>
       </main>
       <footer className={styles.footer}>{es.app.sandboxNotice}</footer>
       {/* New pages start at the top (e.g. the status page after paying from a scrolled catalog). */}

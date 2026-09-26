@@ -26,6 +26,7 @@
     --color-scrim: rgb(10 12 16 / 55%);
     --color-skeleton: #e4e7ec;
     --color-skeleton-shine: #f2f4f7;
+    --color-brand-chip: #fff;
 
     /* Espaciado (escala de 4 pt) */
     --space-1: 0.25rem;

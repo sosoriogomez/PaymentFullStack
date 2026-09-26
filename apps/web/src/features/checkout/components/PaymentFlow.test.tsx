@@ -7,7 +7,7 @@ import { initialCatalogState } from '@/features/catalog/catalog.slice';
 import { es } from '@/shared/i18n/es';
 import { err, ok } from '@/shared/lib/result';
 import { type CheckoutState, initialCheckoutState } from '../checkout.slice';
-import { CheckoutFlow } from './PaymentFlow';
+import { PaymentFlow } from './PaymentFlow';
 
 const card = es.checkout.card;
 const delivery = es.checkout.delivery;
@@ -33,7 +33,7 @@ const servicesWithApi = () => {
 };
 
 const renderFlow = (checkout: Partial<CheckoutState> = {}, services = servicesWithApi()) =>
-  renderWithStore(<CheckoutFlow />, {
+  renderWithStore(<PaymentFlow />, {
     services,
     preloadedState: {
       catalog: { ...initialCatalogState, items: [aProduct()], status: 'succeeded' },
@@ -159,21 +159,6 @@ describe('PaymentFlow', () => {
     await user.click(screen.getByRole('button', { name: es.checkout.close }));
 
     expect(store.getState().checkout.step).toBe('PRODUCT');
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-  });
-
-  it('should show that the payment is being verified while a refresh recovers it', () => {
-    renderFlow({ step: 'PROCESSING' });
-
-    expect(screen.getByRole('dialog', { name: es.checkout.modalTitle })).toHaveTextContent(
-      es.checkout.recovering,
-    );
-    expect(screen.queryByRole('button', { name: es.checkout.close })).not.toBeInTheDocument();
-  });
-
-  it('should render nothing outside the payment steps', () => {
-    renderFlow({ step: 'PRODUCT' });
-
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

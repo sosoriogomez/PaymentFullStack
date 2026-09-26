@@ -9,7 +9,7 @@ export function TransactionDetails({ transaction }: { readonly transaction: Tran
   const { product, card, amounts } = transaction;
   const rows: readonly (readonly [string, string])[] = [
     [texts.reference, transaction.reference],
-    [texts.product, `${product.name} × ${product.quantity}`],
+    [texts.product, es.summary.product(product.name, product.quantity)],
     ...(card ? [[texts.card, `${card.brand} •••• ${card.lastFour}`] as const] : []),
     ...(transaction.status !== 'APPROVED' && transaction.statusMessage
       ? [[texts.reason, transaction.statusMessage] as const]

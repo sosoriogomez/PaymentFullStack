@@ -3,7 +3,10 @@
     inline-size: 2rem;
     block-size: 2rem;
     padding: 2px;
-    background: var(--color-surface-raised);
+
+    /* Brand colors are made for a light background: the chip stays light in dark mode too. */
+    background: var(--color-brand-chip);
     border-radius: var(--radius-sm);
+    box-shadow: inset 0 0 0 var(--border-width) var(--color-border);
   }
 }
