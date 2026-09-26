@@ -62,13 +62,6 @@ export const envSchema = z
         message: 'Set DATABASE_URL or DB_HOST, DB_NAME, DB_USER and DB_PASSWORD',
       });
     }
-    if (env.APP_ENV === 'aws' && !env.ORIGIN_VERIFY_SECRET) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['ORIGIN_VERIFY_SECRET'],
-        message: 'Required when APP_ENV=aws',
-      });
-    }
   });
 
 export type Env = z.infer<typeof envSchema>;
