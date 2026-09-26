@@ -1,4 +1,4 @@
-import { Link, Outlet } from 'react-router';
+import { Link, Outlet, ScrollRestoration } from 'react-router';
 import { es } from '@/shared/i18n/es';
 import styles from './App.module.css';
 
@@ -22,6 +22,8 @@ export function AppLayout() {
         <Outlet />
       </main>
       <footer className={styles.footer}>{es.app.sandboxNotice}</footer>
+      {/* New pages start at the top (e.g. the status page after paying from a scrolled catalog). */}
+      <ScrollRestoration />
     </div>
   );
 }

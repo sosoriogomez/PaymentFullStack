@@ -5,7 +5,9 @@ import {
   checkoutReset,
   fetchAcceptance,
   payOrder,
+  retryWithAnotherCard,
 } from './checkout.actions';
+import { transactionUpdated } from '@/features/transaction/transaction.slice';
 import {
   type AcceptedPaymentForm,
   type ContactDraft,
@@ -55,6 +57,19 @@ export const checkoutSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(checkoutReset, () => initialCheckoutState)
+      .addCase(retryWithAnotherCard, (state, action) => ({
+        ...initialCheckoutState,
+        contact: state.contact,
+        delivery: state.delivery,
+        installments: state.installments,
+        productId: action.payload.productId,
+        quantity: action.payload.quantity,
+        step: 'PAYMENT_FORM' as const,
+      }))
+      .addCase(transactionUpdated, (state, action) => {
+        if (state.step === 'PROCESSING' && action.payload.status !== 'PENDING')
+          state.step = 'RESULT';
+      })
       .addCase(fetchAcceptance.pending, (state) => {
         state.acceptanceStatus = 'loading';
       })
