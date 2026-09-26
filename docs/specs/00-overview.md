@@ -1,6 +1,6 @@
 # Checkout Onboarding — Visión general de specs
 
-> **Versión 1.2** — incorpora las correcciones de la revisión y el ajuste de alcance (S-01, S-02); el detalle de cada cambio y su motivo está en [`CHANGELOG.md`](./CHANGELOG.md). Los planes de implementación derivados están en [`../plans/`](../plans/).
+> **Versión 1.2** — incorpora las correcciones de la revisión y los ajustes de alcance (S-01 a S-04); el detalle de cada cambio y su motivo está en [`CHANGELOG.md`](./CHANGELOG.md). Los planes de implementación derivados están en [`../plans/`](../plans/).
 
 Índice y hoja de ruta de los tres specs de implementación:
 
@@ -10,7 +10,7 @@
 | [`spec-frontend.md`](./spec-frontend.md) | SPA React + Redux Toolkit (Flux), mobile-first, flujo de 5 pasos | FE-00 … FE-11 |
 | [`spec-cloud.md`](./spec-cloud.md) | AWS con CDK, CloudFront + S3 + API Gateway + Lambda + RDS, CI/CD, seguridad | CL-00 … CL-09 |
 
-> **Regla de nombres (obligatoria por la prueba):** el repositorio público **no puede contener el nombre de la compañía evaluadora** — ni en código, ni en commits, ni en estos specs. Se usa "Payment Gateway (PG)" / "pasarela". CI lo verifica con una lista de palabras guardada como secreto (CL-06).
+> **Regla de nombres (obligatoria por la prueba):** el repositorio público **no puede contener el nombre de la compañía evaluadora** — ni en código, ni en commits, ni en estos specs. Se usa "Payment Gateway (PG)" / "pasarela". Se revisa en la checklist de cada PR.
 
 ---
 
@@ -106,7 +106,7 @@ Orden recomendado (cada ítem = rama desde `main` + PR hacia `main`; commits peq
 | Deploy en AWS | CL-01 … CL-07 (+ BE-12 build Lambda) |
 | Uso de sandbox (sin dinero real) | BE-06, CL-03 |
 | Branches y PRs por feature | Convenciones en cada spec |
-| Repo público sin el nombre de la compañía | Regla de nombres + CL-06 |
+| Repo público sin el nombre de la compañía | Regla de nombres (checklist de cada PR) |
 
 ---
 

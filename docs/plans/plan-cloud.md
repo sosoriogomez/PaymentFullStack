@@ -151,11 +151,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Forbidden words
-        env: { FORBIDDEN_WORDS: "${{ secrets.FORBIDDEN_WORDS }}" }
-        run: |
-          test -n "$FORBIDDEN_WORDS" || { echo "FORBIDDEN_WORDS secret is missing"; exit 1; }
-          if git grep -I -i -l -E "$FORBIDDEN_WORDS"; then echo "Forbidden word found in the files above"; exit 1; fi
       - name: Key patterns
         run: |
           if git grep -I -n -E '(pub|prv)_(test|prod|stag[a-z]*)_[A-Za-z0-9]+|_(integrity|events)_[A-Za-z0-9]{10,}'; then exit 1; fi
@@ -165,7 +160,6 @@ jobs:
   audit: # npm audit --omit=dev --audit-level=high
 ```
 
-- `git grep -l` imprime solo nombres de archivo, así el log no revela la palabra prohibida.
 - `actions/setup-node` con `node-version-file: .nvmrc` y caché de npm; `npm ci` una vez por job (workspaces).
 - Branch protection en `main`: PR obligatorio, checks `guards`, `api`, `web`, `infra` y `audit` en verde.
 - `.github/pull_request_template.md` (Qué / Por qué / Cómo probar / Checklist DoD).
@@ -205,7 +199,7 @@ steps:
 
 ### CL-06 · CI temprano — `feat/cl-06-ci`
 
-Se adelanta a la fase 1 (spec overview) para que todo PR posterior pase por los gates. `ci.yml` con los jobs de §4.1 (los de api/web/infra se activan a medida que existen los proyectos), secreto `FORBIDDEN_WORDS` creado en GitHub, plantilla de PR, branch protection. **Aceptación:** un PR de prueba con una palabra prohibida o un patrón de llave falla; uno limpio pasa.
+Se adelanta a la fase 1 (spec overview) para que todo PR posterior pase por los gates. `ci.yml` con los jobs de §4.1 (los de api/web/infra se activan a medida que existen los proyectos), plantilla de PR, branch protection. **Aceptación:** un PR de prueba con un patrón de llave falla; uno limpio pasa.
 
 ### CL-01 · Red — `feat/cl-01-network`
 
@@ -263,7 +257,7 @@ Observatory, SSL Labs y securityheaders.com sobre la URL de CloudFront con captu
 | Infraestructura como código (la prueba evalúa "infrastructure as a code") | CDK completo + tests |
 | Sandbox, sin dinero real | SSM con la URL de sandbox (I-09) |
 | Bonus OWASP, HTTPS y headers | CL-05, CL-09, BE-11 |
-| Repo público sin el nombre de la compañía | Guard `FORBIDDEN_WORDS` en CL-06 |
+| Repo público sin el nombre de la compañía | Regla de nombres, revisada en la checklist de cada PR |
 
 ## 7. Costos y cierre
 
@@ -284,7 +278,7 @@ Tras la evaluación: `npx cdk destroy --all -c stage=prod` y borrar a mano el sn
 | Nest falla en Lambda por metadata de decoradores | Build tsc → esbuild (C-01) y smoke `require` en CI |
 | La API es alcanzable sin pasar por CloudFront | Secreto `X-Origin-Verify` generado + guard en Nest (C-06) |
 | CloudFront devuelve `index.html` en errores de la API | CloudFront Function solo en el behavior por defecto (no `customErrorResponses`) |
-| Se filtra el nombre de la compañía o una llave | Guards de CI + `.gitignore` de `.env*` y `*.pdf` |
+| Se filtra el nombre de la compañía o una llave | Regla de nombres en la checklist de cada PR, guarda de patrones de llave en CI y `.gitignore` de `.env*` y `*.pdf` |
 | Costos inesperados | Free tier: NAT instance en vez de NAT Gateway, sin RDS Proxy ni WAF; `cdk destroy` documentado para después de la evaluación |
 
 ## 9. Definition of Done (todas las features)
