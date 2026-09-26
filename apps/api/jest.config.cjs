@@ -1,7 +1,8 @@
 /** @type {import('jest').Config} */
-const project = (displayName, testMatch) => ({
+const project = (displayName, testMatch, extra = {}) => ({
   displayName,
   testMatch,
+  ...extra,
   testEnvironment: 'node',
   moduleFileExtensions: ['ts', 'js', 'json'],
   transform: { '^.+\\.ts$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json' }] },
@@ -12,11 +13,19 @@ const project = (displayName, testMatch) => ({
   },
 });
 
+/** Integration and e2e tests run against a real Postgres (Testcontainers or TEST_DATABASE_URL). */
+const withDatabase = {
+  globalSetup: '<rootDir>/test/support/database/global-setup.ts',
+  globalTeardown: '<rootDir>/test/support/database/global-teardown.ts',
+  testTimeout: 30_000,
+};
+
 module.exports = {
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.spec.ts',
     '!src/main.ts',
+    '!src/database/cli.ts',
     '!src/**/*.module.ts',
     '!src/**/migrations/**',
     '!src/**/seeds/**',
@@ -27,7 +36,7 @@ module.exports = {
   },
   projects: [
     project('unit', ['<rootDir>/src/**/*.spec.ts']),
-    project('integration', ['<rootDir>/test/integration/**/*.int-spec.ts']),
-    project('e2e', ['<rootDir>/test/e2e/**/*.e2e-spec.ts']),
+    project('integration', ['<rootDir>/test/integration/**/*.int-spec.ts'], withDatabase),
+    project('e2e', ['<rootDir>/test/e2e/**/*.e2e-spec.ts'], withDatabase),
   ],
 };
