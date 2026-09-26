@@ -54,10 +54,13 @@ describe('parseEnv', () => {
     expect(env.DB_PORT).toBe(5432);
   });
 
-  it('should require the origin verify secret when running on aws', () => {
-    expect(() => parseEnv(testEnv({ APP_ENV: 'aws' }))).toThrow(/ORIGIN_VERIFY_SECRET/);
+  it('should accept an optional origin verify secret of at least 16 characters', () => {
     expect(
-      parseEnv(testEnv({ APP_ENV: 'aws', ORIGIN_VERIFY_SECRET: 'a'.repeat(32) })).APP_ENV,
-    ).toBe('aws');
+      parseEnv(testEnv({ APP_ENV: 'aws', ORIGIN_VERIFY_SECRET: 'a'.repeat(32) }))
+        .ORIGIN_VERIFY_SECRET,
+    ).toHaveLength(32);
+    expect(() => parseEnv(testEnv({ ORIGIN_VERIFY_SECRET: 'short' }))).toThrow(
+      /ORIGIN_VERIFY_SECRET/,
+    );
   });
 });
