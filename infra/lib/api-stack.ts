@@ -56,7 +56,7 @@ export class ApiStack extends Stack {
     });
 
     this.workerEnvironment = this.environmentFor(props);
-    this.apiFunction = this.createFunction(props, 'api', 'lambda.handler', {
+    this.apiFunction = this.createFunction(props, 'ApiLambda', 'api', 'lambda.handler', {
       description: 'Checkout HTTP API (NestJS)',
       environment: {
         ...this.workerEnvironment,
@@ -64,11 +64,18 @@ export class ApiStack extends Stack {
       },
       reservedConcurrency: config.api.reservedConcurrency,
     }).function;
-    this.migrateFunction = this.createFunction(props, 'migrate', 'migrate.handler', {
-      description: 'Runs database migrations and the catalog seed (invoked by the deploy pipeline)',
-      environment: this.workerEnvironment,
-      timeout: Duration.minutes(5),
-    }).function;
+    this.migrateFunction = this.createFunction(
+      props,
+      'MigrateLambda',
+      'migrate',
+      'migrate.handler',
+      {
+        description:
+          'Runs database migrations and the catalog seed (invoked by the deploy pipeline)',
+        environment: this.workerEnvironment,
+        timeout: Duration.minutes(5),
+      },
+    ).function;
     this.originVerifySecret.grantRead(this.apiFunction);
 
     this.httpApi = this.createHttpApi(config);
@@ -115,6 +122,7 @@ export class ApiStack extends Stack {
 
   private createFunction(
     props: ApiStackProps,
+    id: string,
     name: string,
     handler: string,
     options: {
@@ -124,23 +132,19 @@ export class ApiStack extends Stack {
       reservedConcurrency?: number | undefined;
     },
   ): ApiLambda {
-    const lambdaConstruct = new ApiLambda(
-      this,
-      `${name[0]?.toUpperCase() ?? ''}${name.slice(1)}Lambda`,
-      {
-        config: props.config,
-        name,
-        handler,
-        code: props.code,
-        vpc: props.vpc,
-        securityGroup: props.lambdaSecurityGroup,
-        environment: options.environment,
-        timeout: options.timeout ?? props.config.api.timeout,
-        memorySize: props.config.api.memoryMb,
-        description: options.description,
-        reservedConcurrency: options.reservedConcurrency,
-      },
-    );
+    const lambdaConstruct = new ApiLambda(this, id, {
+      config: props.config,
+      name,
+      handler,
+      code: props.code,
+      vpc: props.vpc,
+      securityGroup: props.lambdaSecurityGroup,
+      environment: options.environment,
+      timeout: options.timeout ?? props.config.api.timeout,
+      memorySize: props.config.api.memoryMb,
+      description: options.description,
+      reservedConcurrency: options.reservedConcurrency,
+    });
     this.grantRuntimeAccess(lambdaConstruct.function, props.database, props.config);
     return lambdaConstruct;
   }
