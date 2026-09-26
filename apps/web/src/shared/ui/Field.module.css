@@ -1,6 +1,7 @@
 @layer components {
   .field {
     display: grid;
+    align-content: start; /* in a row with a taller neighbour (hint), the input stays under its label */
     gap: var(--space-1);
     min-width: 0;
   }
