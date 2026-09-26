@@ -95,13 +95,29 @@ describe('WebStack', () => {
     );
   });
 
-  it('should not cache the API and should forward viewer headers except Host', () => {
+  it('should not cache the API and forward only what it reads, with the viewer address', () => {
     const apiBehavior = distributionConfig().CacheBehaviors.find(
       (behavior) => behavior.PathPattern === '/api/*',
     );
 
     expect(apiBehavior?.CachePolicyId).toBe('4135ea2d-6df8-44a3-9df3-4b5a84be39ad'); // CachingDisabled
-    expect(apiBehavior?.OriginRequestPolicyId).toBe('b689b0a8-53d0-40ab-baf2-68738e2966ac'); // AllViewerExceptHostHeader
+    template.hasResourceProperties('AWS::CloudFront::OriginRequestPolicy', {
+      OriginRequestPolicyConfig: {
+        Name: 'checkout-prod-api-origin-request',
+        HeadersConfig: {
+          HeaderBehavior: 'whitelist',
+          Headers: Match.arrayWith([
+            'Idempotency-Key',
+            'X-Event-Checksum',
+            'CloudFront-Viewer-Address',
+          ]),
+        },
+        QueryStringsConfig: { QueryStringBehavior: 'all' },
+        CookiesConfig: { CookieBehavior: 'none' },
+      },
+    });
+    const headers = JSON.stringify(template.findResources('AWS::CloudFront::OriginRequestPolicy'));
+    expect(headers.toLowerCase()).not.toContain('"host"');
   });
 
   it('should add the origin verify header from Secrets Manager, not as a literal', () => {
