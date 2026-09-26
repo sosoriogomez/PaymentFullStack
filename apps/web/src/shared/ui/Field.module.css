@@ -1,6 +1,7 @@
 @layer components {
   .field {
     display: grid;
+    align-content: start; /* in a row with a taller neighbour (hint), the input stays under its label */
     gap: var(--space-1);
     min-width: 0;
   }
@@ -9,6 +10,11 @@
     font-size: var(--text-sm);
     font-weight: var(--weight-medium);
     color: var(--color-text);
+  }
+
+  /* Progressive enhancement: without :has() the label simply keeps its color. */
+  .field:has(.input:focus-visible) .label {
+    color: var(--color-focus);
   }
 
   .control {

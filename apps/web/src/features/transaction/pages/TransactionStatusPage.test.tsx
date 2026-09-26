@@ -9,6 +9,7 @@ import {
 } from '@test/builders';
 import { createFakeServices, type FakeServices } from '@test/fakes/fake-services';
 import { renderRoute } from '@test/support/render-route';
+import { preloadTransactionStatusPage } from '@/app/lazy-pages';
 import { type RootState } from '@/app/store';
 import { initialCatalogState } from '@/features/catalog/catalog.slice';
 import { initialCheckoutState } from '@/features/checkout/checkout.slice';
@@ -61,6 +62,11 @@ const renderStatus = (services: FakeServices, preloadedState?: Partial<RootState
 const tick = (ms: number) => act(() => jest.advanceTimersByTimeAsync(ms));
 
 describe('TransactionStatusPage', () => {
+  // The page is a deferred chunk: loaded up front, it renders like after the idle prefetch.
+  beforeAll(async () => {
+    await preloadTransactionStatusPage();
+  });
+
   beforeEach(() => {
     jest.useFakeTimers();
   });
