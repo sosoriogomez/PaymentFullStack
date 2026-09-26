@@ -1,0 +1,38 @@
+# Dependencias
+node_modules/
+
+# Builds
+dist/
+dist-lambda/
+build/
+*.tsbuildinfo
+
+# Infraestructura (CDK)
+cdk.out/
+cdk.context.json
+outputs.json
+
+# Tests y reportes
+coverage/
+.lighthouseci/
+test-results/
+playwright-report/
+
+# Variables de entorno (solo se versiona el ejemplo)
+.env
+.env.*
+!.env.example
+
+# Documentos externos de la prueba (contienen datos que no deben publicarse)
+*.pdf
+
+# Logs y temporales
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Editores
+.idea/
+.vscode/*
+!.vscode/extensions.json
