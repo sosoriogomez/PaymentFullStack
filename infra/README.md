@@ -68,6 +68,8 @@ Requisitos: una cuenta de AWS, AWS CLI con credenciales de administrador (solo p
    | `PG_BASE_URL` | Variable | URL de la sandbox (la usa el navegador para tokenizar) |
    | `PG_PUBLIC_KEY` | Variable | Llave pública (pública por diseño) |
 
+   Deben ser variables del repositorio, no de un *environment*, porque la condición del job solo ve esas. Mientras `AWS_DEPLOY_ROLE_ARN` no exista, el deploy se omite y `main` queda en verde.
+
 5. **Push a `main`.** El workflow [`deploy.yml`](../.github/workflows/deploy.yml) hace, en orden:
    1. Construye la Lambda: `tsc` y luego esbuild.
    2. Corre `cdk deploy --all`.
