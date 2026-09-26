@@ -338,6 +338,7 @@ private createAndCharge(cmd: CreateTransactionCommand, fingerprint: string) {
 - Decorador de parámetro `@IdempotencyKeyHeader()` que valida UUID v4 (400 si falta o es inválido).
 - `GET /api/v1/transactions?idempotencyKey=` → `FindTransactionByIdempotencyKey` (404 si no existe).
 - El `cardToken` solo vive en el comando y en la llamada a la pasarela: nunca se persiste ni se loguea.
+- El límite de 10 req/min/IP de `POST /transactions` se activa en BE-11, junto con el throttler global y el tracker `CloudFront-Viewer-Address` (I-01): antes de eso, detrás de CloudFront contaría la IP del edge y no la del cliente.
 
 **Tests:** los cinco escenarios del spec + otro token con la misma key (replay sin segundo cobro) + otra cantidad (422) + concurrencia real (integración: dos `execute` en `Promise.all` → una fila, una llamada al fake).
 
