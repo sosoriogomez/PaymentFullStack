@@ -125,7 +125,7 @@ jobs:
           name: api-lambda-bundle
           path: apps/api/dist-lambda
       - name: Synthesize every stack with cdk-nag
-        run: npm run synth -w infra -- -c pgHost=gateway.example
+        run: npm run synth -w infra -- -c pgHost=gateway.example -c alarmEmail=alarms@example.com
       - name: Coverage summary
         if: always()
         run: node .github/scripts/coverage-summary.mjs infra/coverage/coverage-summary.json "Infra" >> "$GITHUB_STEP_SUMMARY"
