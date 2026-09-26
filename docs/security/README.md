@@ -51,6 +51,36 @@ Detrás de CloudFront → API Gateway, la IP del socket es la de un *edge*. La A
 
 Limitación conocida: los contadores viven en la memoria de cada instancia de Lambda, así que el límite es *best-effort*. El límite global lo pone el throttling de API Gateway. Una regla *rate-based* de AWS WAF sería la mejora siguiente (tiene costo).
 
+## Infraestructura
+
+| Control | Cómo | Dónde | Prueba |
+|---|---|---|---|
+| TLS del navegador a CloudFront | HTTP → HTTPS con redirección, HTTP/2 y HTTP/3, HSTS | `web-stack.ts` | `web-stack.test.ts` |
+| TLS de CloudFront a los orígenes | API Gateway solo por HTTPS (`HTTPS_ONLY`); S3 por *Origin Access Control*, con el bucket privado (`BLOCK_ALL`), cifrado y `enforceSSL` | `web-stack.ts` | `web-stack.test.ts` |
+| TLS de la Lambda a RDS | La base rechaza conexiones sin TLS (`rds.force_ssl = 1`) y la API verifica el certificado contra el bundle de CA de RDS incluido en el paquete (`rejectUnauthorized: true`) | `database-stack.ts`, `data-source-options.ts`, `bundle-lambda.mjs` | `database-stack.test.ts`, `data-source-options.spec.ts` |
+| TLS de la Lambda a la pasarela | La URL de la sandbox (`https://…`) viene de SSM, no del usuario; las respuestas se validan con zod | `app-config.service.ts`, `http-payment-gateway.adapter.ts` | `http-payment-gateway.adapter.spec.ts` |
+| Base de datos privada | Subredes aisladas, sin acceso público, almacenamiento cifrado; el security group solo admite PostgreSQL desde el de las Lambdas | `database-stack.ts`, `network-stack.ts` | `database-stack.test.ts`, `network-stack.test.ts` |
+| La API solo responde a CloudFront | Secreto `X-Origin-Verify` en Secrets Manager; sin él, 403 | `origin-verify.guard.ts`, `api-stack.ts` | `origin-verify.e2e-spec.ts`, `smoke-test.sh` |
+| Mínimo privilegio en IAM | Las Lambdas leen solo `/checkout/prod/*` y su secreto de base de datos; solo la Lambda HTTP lee el secreto de origen; el rol de GitHub solo asume los roles de bootstrap de CDK, publica en el bucket web, invalida la caché e invoca la migración | `api-stack.ts`, `github-oidc-stack.ts` | `api-stack.test.ts`, `github-oidc-stack.test.ts` |
+| CI/CD sin llaves estáticas | OIDC: el rol solo confía en workflows de la rama `main` de este repositorio | `github-oidc-stack.ts` | `github-oidc-stack.test.ts` |
+| Logs sin datos sensibles | La API redacta tokens, email y teléfono (pino); los *access logs* de API Gateway no guardan cuerpos y la IP que registran es la del *edge* de CloudFront; retención de 14 días (7 para los *flow logs*) | `logger.config.ts`, `api-stack.ts`, `network-stack.ts` | `logger.config.spec.ts`, `api-stack.test.ts`, `network-stack.test.ts` |
+| Reglas de AWS en cada synth | `cdk-nag` (`AwsSolutionsChecks`) hace fallar el synth ante un hallazgo sin justificación escrita | `app-aspects.ts` | Un test "no unjustified cdk-nag findings" por stack |
+
+## Verificación externa (tras el deploy)
+
+Estas herramientas necesitan la URL pública, así que se corren después de cada deploy a producción. `infra/scripts/smoke-test.sh` ya comprueba en el pipeline que las cabeceras de seguridad están presentes y que API Gateway rechaza las llamadas directas.
+
+1. [Mozilla Observatory](https://observatory.mozilla.org/) sobre la URL de CloudFront. Objetivo: A o superior.
+2. [SSL Labs](https://www.ssllabs.com/ssltest/) sobre el dominio de CloudFront. Objetivo: A.
+3. [securityheaders.com](https://securityheaders.com/) sobre la URL de CloudFront. Objetivo: A.
+4. Guardar las capturas en `docs/security/` y completar la tabla.
+
+| Herramienta | Resultado | Fecha |
+|---|---|---|
+| Mozilla Observatory | Pendiente del primer deploy | — |
+| SSL Labs | Pendiente del primer deploy | — |
+| securityheaders.com | Pendiente del primer deploy | — |
+
 ## Secretos
 
 - Llaves de la pasarela: SSM `SecureString` bajo `/checkout/prod/*`, cargadas con `put-parameters.sh` y leídas por las Lambdas al iniciar. La política IAM limita la lectura a ese prefijo.
