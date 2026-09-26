@@ -10,12 +10,19 @@ import { type RenderWithStoreOptions } from './render-with-store';
 /** Renders the real routes (real store, fake services) at the given path. */
 export function renderRoute(
   path: string,
-  options: Omit<RenderWithStoreOptions, keyof RenderOptions> = {},
+  options: Omit<RenderWithStoreOptions, keyof RenderOptions> & {
+    readonly userOptions?: Parameters<typeof userEvent.setup>[0];
+  } = {},
 ) {
-  const { preloadedState, services = createFakeServices(), registrations = [] } = options;
+  const {
+    preloadedState,
+    services = createFakeServices(),
+    registrations = [],
+    userOptions,
+  } = options;
   const store = createAppStore(services, preloadedState, registrations);
   const router = createMemoryRouter(routes, { initialEntries: [path] });
-  const user = userEvent.setup();
+  const user = userEvent.setup(userOptions);
   const view = render(
     <Provider store={store}>
       <RouterProvider router={router} />
