@@ -2,7 +2,7 @@ import { aProduct, PRODUCT_ID } from '../../../../test/builders/product.builder'
 import { InMemoryProductRepository } from '../../../../test/fakes/in-memory-product.repository';
 import { err } from '../../../shared/kernel/result';
 import { inCents } from '../domain/order-amounts';
-import { FlatFeePolicy } from '../infrastructure/flat-fee.policy';
+import { FlatFeePolicy } from '../domain/flat-fee.policy';
 import { GetQuote } from './get-quote.use-case';
 
 const fees = new FlatFeePolicy({

@@ -7,7 +7,7 @@ import {
 import { ProductsModule } from '../products/products.module';
 import { GetQuote } from './application/get-quote.use-case';
 import { FEE_POLICY, type FeePolicy } from './domain/fee-policy.port';
-import { FlatFeePolicy } from './infrastructure/flat-fee.policy';
+import { FlatFeePolicy } from './domain/flat-fee.policy';
 import { CheckoutController } from './infrastructure/http/checkout.controller';
 
 @Module({
