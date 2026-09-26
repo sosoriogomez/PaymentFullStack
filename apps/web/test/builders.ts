@@ -1,3 +1,4 @@
+import { type PaymentFormValues } from '@/features/checkout/domain/payment-form-schema';
 import {
   type Delivery,
   type OrderAmounts,
@@ -55,5 +56,33 @@ export const aDelivery = (overrides: Partial<Delivery> = {}): Delivery => ({
   region: 'Antioquia',
   country: 'CO',
   postalCode: '050021',
+  ...overrides,
+});
+
+export const CUSTOMER_ID = 'c3d4e5f6-a7b8-4c9d-8e0f-2a3b4c5d6e7f';
+export const ACCEPTANCE = {
+  acceptanceToken: 'acceptance-token',
+  acceptancePermalink: 'https://gateway.test/terms/privacy.pdf',
+  personalDataAuthToken: 'personal-data-token',
+  personalDataAuthPermalink: 'https://gateway.test/terms/personal-data.pdf',
+};
+
+/** A complete, valid payment form (test card 4242, expiry far in the future). */
+export const aPaymentForm = (overrides: Partial<PaymentFormValues> = {}): PaymentFormValues => ({
+  number: '4242 4242 4242 4242',
+  holderName: 'Ana Pérez',
+  expiry: '12/40',
+  cvc: '123',
+  installments: 1,
+  fullName: 'Ana Pérez',
+  email: 'ana@mail.com',
+  phone: '3001234567',
+  addressLine1: 'Cra 43A # 1-50',
+  addressLine2: 'Apto 301',
+  region: 'Antioquia',
+  city: 'Medellín',
+  postalCode: '050021',
+  acceptTerms: true,
+  acceptPersonalData: true,
   ...overrides,
 });
