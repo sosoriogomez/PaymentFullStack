@@ -3,6 +3,9 @@ import { useState } from 'react';
 import { Navigate } from 'react-router';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { es } from '@/shared/i18n/es';
+import { Modal } from '@/shared/ui/Modal';
+import { Spinner } from '@/shared/ui/Spinner';
 import { selectCheckoutStep, selectDeliveryDefaults } from '../checkout.selectors';
 import { submitPaymentForm } from '../checkout.thunks';
 import {
@@ -50,6 +53,14 @@ export function CheckoutFlow() {
   const transactionId = useAppSelector((state) => state.transaction.current?.id);
   if (step === 'PROCESSING' && transactionId) {
     return <Navigate to={`/transactions/${transactionId}`} />;
+  }
+  if (step === 'PROCESSING') {
+    // A refresh interrupted the payment: the key is being looked up (recoverCheckout).
+    return (
+      <Modal open title={es.checkout.modalTitle} dismissible={false} onClose={() => undefined}>
+        <Spinner label={es.checkout.recovering} showLabel />
+      </Modal>
+    );
   }
   return step === 'PAYMENT_FORM' || step === 'SUMMARY' ? <PaymentFlow /> : null;
 }
