@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { DatabaseModule } from './database/database.module';
 import { CheckoutModule } from './modules/checkout/checkout.module';
 import { CustomersModule } from './modules/customers/customers.module';
+import { DeliveriesModule } from './modules/deliveries/deliveries.module';
 import { ProductsModule } from './modules/products/products.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { ConfigModule } from './shared/infrastructure/config/config.module';
@@ -22,6 +23,7 @@ import { LoggingModule } from './shared/infrastructure/logging/logging.module';
     CheckoutModule,
     CustomersModule,
     TransactionsModule,
+    DeliveriesModule,
   ],
 })
 export class AppModule {}
