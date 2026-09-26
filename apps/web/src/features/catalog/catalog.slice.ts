@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { type Product } from '@/shared/api/contracts';
 import { type UiError } from '@/shared/lib/ui-error';
+import { fetchProducts, refreshProductStock } from './catalog.thunks';
 
 export type LoadStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
 
@@ -12,28 +13,37 @@ export interface CatalogState {
 
 export const initialCatalogState: CatalogState = { items: [], status: 'idle', error: null };
 
+const updateStock = (state: CatalogState, productId: string, available: number) => {
+  const product = state.items.find((item) => item.id === productId);
+  if (product) product.stock = available;
+};
+
 export const catalogSlice = createSlice({
   name: 'catalog',
   initialState: initialCatalogState,
   reducers: {
-    productsRequested(state) {
-      state.status = 'loading';
-      state.error = null;
-    },
-    productsLoaded(state, action: PayloadAction<Product[]>) {
-      state.items = action.payload;
-      state.status = 'succeeded';
-    },
-    productsFailed(state, action: PayloadAction<UiError>) {
-      state.status = 'failed';
-      state.error = action.payload;
-    },
     productStockUpdated(state, action: PayloadAction<{ productId: string; available: number }>) {
-      const product = state.items.find((item) => item.id === action.payload.productId);
-      if (product) product.stock = action.payload.available;
+      updateStock(state, action.payload.productId, action.payload.available);
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchProducts.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(fetchProducts.fulfilled, (state, action) => {
+        state.items = action.payload;
+        state.status = 'succeeded';
+      })
+      .addCase(fetchProducts.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload ?? { code: 'UNKNOWN', message: action.error.message ?? '' };
+      })
+      .addCase(refreshProductStock.fulfilled, (state, action) => {
+        updateStock(state, action.payload.productId, action.payload.available);
+      });
   },
 });
 
-export const { productsRequested, productsLoaded, productsFailed, productStockUpdated } =
-  catalogSlice.actions;
+export const { productStockUpdated } = catalogSlice.actions;
