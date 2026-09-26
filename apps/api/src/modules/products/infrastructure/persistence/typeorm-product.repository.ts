@@ -9,8 +9,14 @@ import { ProductOrmEntity } from './product.orm-entity';
 export class TypeOrmProductRepository implements ProductRepository {
   constructor(private readonly dataSource: DataSource) {}
 
+  /** Available products first, sold out ones last; then by SKU for a stable order. */
   async findAll(limit: number): Promise<Product[]> {
-    const rows = await this.repository().find({ order: { sku: 'ASC' }, take: limit });
+    const rows = await this.repository()
+      .createQueryBuilder('product')
+      .orderBy('product.stock = 0', 'ASC')
+      .addOrderBy('product.sku', 'ASC')
+      .take(limit)
+      .getMany();
     return rows.map(toProduct);
   }
 
