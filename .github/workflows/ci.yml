@@ -61,7 +61,15 @@ jobs:
       - name: Coverage summary
         if: always()
         run: node .github/scripts/coverage-summary.mjs apps/api/coverage/coverage-summary.json "API" >> "$GITHUB_STEP_SUMMARY"
-      - run: npm run build -w apps/api
+      - name: Lambda bundle (tsc + esbuild, ADR-005)
+        run: npm run build:lambda -w apps/api
+      - name: Load every bundled handler
+        run: npm run smoke:lambda -w apps/api
+      - uses: actions/upload-artifact@v4
+        with:
+          name: api-lambda-bundle
+          path: apps/api/dist-lambda
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         if: always()
         with:
