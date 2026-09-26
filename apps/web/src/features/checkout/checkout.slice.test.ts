@@ -1,11 +1,15 @@
-import { checkoutReset } from './checkout.actions';
+import { ACCEPTANCE, someAmounts } from '@test/builders';
+import { checkoutReset, fetchAcceptance } from './checkout.actions';
 import {
   checkoutSlice,
   checkoutStarted,
   contactDraftUpdated,
   deliveryDraftUpdated,
   initialCheckoutState,
+  paymentFormAccepted,
   paymentFormClosed,
+  paymentFormFailed,
+  paymentFormSubmitted,
   summaryEditRequested,
 } from './checkout.slice';
 
@@ -66,5 +70,62 @@ describe('checkout reducer', () => {
     };
 
     expect(reduce(busy, checkoutReset())).toEqual(initialCheckoutState);
+  });
+
+  describe('payment form submission', () => {
+    const accepted = {
+      card: { brand: 'VISA', lastFour: '4242', holderName: 'Ana Pérez' },
+      cardToken: 'tok_1',
+      cardTokenExpiresAt: 1,
+      customerId: 'c1',
+      quote: someAmounts(),
+      installments: 2,
+      contact: { fullName: 'Ana Pérez', email: 'ana@mail.com', phone: '3001234567' },
+      delivery: {
+        addressLine1: 'Cra 43A # 1-50',
+        addressLine2: '',
+        city: 'Medellín',
+        region: 'Antioquia',
+        postalCode: '',
+      },
+      idempotencyKey: 'k1',
+    };
+
+    it('should track the request and move to the summary with the accepted data', () => {
+      const pending = reduce(initialCheckoutState, paymentFormSubmitted());
+      const summary = reduce(
+        { ...pending, cardReentryRequired: true },
+        paymentFormAccepted(accepted),
+      );
+
+      expect(pending.submission.status).toBe('pending');
+      expect(summary).toMatchObject({
+        ...accepted,
+        step: 'SUMMARY',
+        cardReentryRequired: false,
+        submission: { status: 'idle', error: null },
+      });
+    });
+
+    it('should keep the form open with the error when it fails', () => {
+      const error = { code: 'CARD_REJECTED', message: 'rechazada' };
+
+      expect(reduce(initialCheckoutState, paymentFormFailed(error)).submission).toEqual({
+        status: 'failed',
+        error,
+      });
+    });
+  });
+
+  describe('acceptance', () => {
+    it('should load the acceptance tokens', () => {
+      const loading = reduce(initialCheckoutState, { type: fetchAcceptance.pending.type });
+      const loaded = reduce(loading, { type: fetchAcceptance.fulfilled.type, payload: ACCEPTANCE });
+      const failed = reduce(loading, { type: fetchAcceptance.rejected.type });
+
+      expect(loading.acceptanceStatus).toBe('loading');
+      expect(loaded).toMatchObject({ acceptance: ACCEPTANCE, acceptanceStatus: 'succeeded' });
+      expect(failed.acceptanceStatus).toBe('failed');
+    });
   });
 });

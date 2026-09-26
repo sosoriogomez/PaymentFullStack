@@ -21,3 +21,16 @@
     gap: var(--space-4);
   }
 }
+
+@layer components {
+  .form {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .feedback {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+  }
+}

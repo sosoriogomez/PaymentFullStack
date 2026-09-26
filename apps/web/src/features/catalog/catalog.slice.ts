@@ -1,9 +1,10 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { type Product } from '@/shared/api/contracts';
+import { type LoadStatus } from '@/shared/lib/load-status';
 import { type UiError } from '@/shared/lib/ui-error';
 import { fetchProducts, refreshProductStock } from './catalog.thunks';
 
-export type LoadStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
+export type { LoadStatus };
 
 export interface CatalogState {
   readonly items: Product[];

@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { checkoutStarted } from '@/features/checkout/checkout.slice';
+import { CheckoutFlow } from '@/features/checkout/components/PaymentFlow';
 import { es } from '@/shared/i18n/es';
 import { Alert } from '@/shared/ui/Alert';
 import { Button } from '@/shared/ui/Button';
@@ -53,6 +54,7 @@ export function ProductPage() {
             ))
           : null}
       </div>
+      <CheckoutFlow />
     </section>
   );
 }
