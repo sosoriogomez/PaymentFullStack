@@ -82,7 +82,7 @@ infra/
 │   ├── database-stack.ts
 │   ├── api-stack.ts
 │   ├── web-stack.ts
-│   └── constructs/                  # security-headers-policy.ts, spa-rewrite-function.ts, api-lambda.ts, scheduled-reconciler.ts
+│   └── constructs/                  # security-headers-policy.ts, spa-rewrite-function.ts, api-lambda.ts
 ├── functions/spa-rewrite.js         # CloudFront Function
 ├── scripts/put-parameters.sh        # carga secretos a SSM desde variables locales (no versionadas)
 ├── test/*.test.ts
@@ -147,7 +147,7 @@ Cada feature = **rama `feat/cl-XX-...` desde `main` + PR hacia `main`**. DoD com
 
 - `ApiFunction` (`lambda.Function`, `Code.fromAsset('apps/api/dist-lambda')`, handler `lambda.handler`): Node 24 arm64, 1024 MB, timeout 20 s, `reservedConcurrentExecutions` **solo si `stageConfig.api.reservedConcurrency` está definido** (C-02), VPC `PRIVATE_WITH_EGRESS`, `LambdaSg`, log retention 14 días, `NODE_OPTIONS=--enable-source-maps`, `APP_ENV=aws`.
 - `MigrateFunction` (mismo asset, handler `migrate.handler`): timeout 5 min, mismos permisos de DB; se invoca solo desde CD.
-- `ReconcileFunction` (mismo asset, handler `reconcile.handler`, C-03): timeout 60 s, permisos de DB y SSM; la invoca un **EventBridge Scheduler** `rate(5 minutes)` con reintentos 2 y *flexible time window* apagado. Construct `ScheduledReconciler`.
+- `ReconcileFunction` (mismo asset, handler `reconcile.handler`, C-03): timeout 60 s, permisos de DB y SSM; la invoca un **EventBridge Scheduler** `rate(5 minutes)` sin reintentos (la corrida siguiente cubre lo pendiente), edad máxima del evento de 4 min y *flexible time window* apagado (ADR-007).
 - API Gateway **HTTP API** (`$default` stage), ruta `ANY /{proxy+}` → integración Lambda (payload v2), throttling (rate 25 rps, burst 50), access logs JSON en CloudWatch.
 - La API valida `X-Origin-Verify` (middleware Nest; 403 si falta o no coincide, excepto en local).
 
