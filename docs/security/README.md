@@ -86,7 +86,7 @@ Estas herramientas necesitan la URL pública, así que se corren después de cad
 - Llaves de la pasarela: SSM `SecureString` bajo `/checkout/prod/*`, cargadas con `put-parameters.sh` y leídas por las Lambdas al iniciar. La política IAM limita la lectura a ese prefijo.
 - Credenciales de la base de datos: Secrets Manager (generadas por RDS).
 - `X-Origin-Verify`: Secrets Manager, generado por CDK; CloudFront lo resuelve como *dynamic reference* (C-06).
-- CI/CD: OIDC con GitHub, sin llaves de AWS de larga duración. En CI una verificación busca patrones de llaves y el nombre de la compañía antes de cualquier otro paso.
+- CI/CD: OIDC con GitHub, sin llaves de AWS de larga duración. En CI una verificación busca patrones de llaves de la pasarela antes de cualquier otro paso.
 
 ## Dependencias
 

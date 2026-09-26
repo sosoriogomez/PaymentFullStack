@@ -67,7 +67,6 @@ Requisitos: una cuenta de AWS, AWS CLI con credenciales de administrador (solo p
    | `PG_HOST` | Variable | Host de la pasarela, para el `connect-src` de la CSP |
    | `PG_BASE_URL` | Variable | URL de la sandbox (la usa el navegador para tokenizar) |
    | `PG_PUBLIC_KEY` | Variable | Llave pública (pública por diseño) |
-   | `FORBIDDEN_WORDS` | Secret | Palabras que el CI no debe encontrar en el repositorio |
 
 5. **Push a `main`.** El workflow [`deploy.yml`](../.github/workflows/deploy.yml) hace, en orden:
    1. Construye la Lambda: `tsc` y luego esbuild.

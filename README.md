@@ -133,7 +133,7 @@ El CI ([`ci.yml`](.github/workflows/ci.yml)) corre en cada PR y en cada push a `
 - los tests con un umbral de cobertura del 85 %;
 - el build de la Lambda y el synth de CDK con `cdk-nag`;
 - `npm audit`;
-- una búsqueda de llaves y de palabras prohibidas en el repositorio.
+- una búsqueda de patrones de llaves de la pasarela en el repositorio.
 
 ## Documentación
 
