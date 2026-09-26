@@ -1,4 +1,5 @@
 import { Body, Controller, Headers, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { unwrapOrThrow } from '../../../../shared/infrastructure/http/unwrap';
 import { HandlePaymentEvent } from '../../application/handle-payment-event.use-case';
 
@@ -9,6 +10,8 @@ export class PaymentEventReceipt {
 }
 
 /** Webhook of the gateway: authenticated by the event checksum, not by the caller. */
+// The gateway retries events it could not deliver: never rate limited (checksum-authenticated).
+@SkipThrottle()
 @Controller({ path: 'payment-events', version: '1' })
 export class PaymentEventsController {
   constructor(private readonly handlePaymentEvent: HandlePaymentEvent) {}
