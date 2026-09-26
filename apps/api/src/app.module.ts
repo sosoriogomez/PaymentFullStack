@@ -3,6 +3,7 @@ import { DatabaseModule } from './database/database.module';
 import { CheckoutModule } from './modules/checkout/checkout.module';
 import { CustomersModule } from './modules/customers/customers.module';
 import { ProductsModule } from './modules/products/products.module';
+import { TransactionsModule } from './modules/transactions/transactions.module';
 import { ConfigModule } from './shared/infrastructure/config/config.module';
 import { HealthModule } from './shared/infrastructure/health/health.module';
 import { HttpInfrastructureModule } from './shared/infrastructure/http/http.module';
@@ -20,6 +21,7 @@ import { LoggingModule } from './shared/infrastructure/logging/logging.module';
     ProductsModule,
     CheckoutModule,
     CustomersModule,
+    TransactionsModule,
   ],
 })
 export class AppModule {}
