@@ -1,0 +1,9 @@
+node_modules
+dist
+dist-lambda
+coverage
+cdk.out
+.lighthouseci
+package-lock.json
+# La documentación se escribe a mano (tablas y diagramas); no se reformatea.
+*.md
