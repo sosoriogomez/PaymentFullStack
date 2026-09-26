@@ -56,15 +56,14 @@ describe('GET /api/v1/deliveries/:id', () => {
       productId: product.id,
       quantity: 2,
       status: 'ASSIGNED',
-      recipient: { name: DELIVERY.recipientName, phone: '***6543' },
-      address: {
-        addressLine1: DELIVERY.addressLine1,
-        addressLine2: DELIVERY.addressLine2,
-        city: DELIVERY.city,
-        region: DELIVERY.region,
-        country: 'CO',
-        postalCode: DELIVERY.postalCode,
-      },
+      recipientName: DELIVERY.recipientName,
+      recipientPhone: '***6543',
+      addressLine1: DELIVERY.addressLine1,
+      addressLine2: DELIVERY.addressLine2,
+      city: DELIVERY.city,
+      region: DELIVERY.region,
+      country: 'CO',
+      postalCode: DELIVERY.postalCode,
       createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T/),
     });
     expect(JSON.stringify(response.body)).not.toContain('3109876543');
