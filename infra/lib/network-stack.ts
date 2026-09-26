@@ -20,8 +20,6 @@ export class NetworkStack extends Stack {
   readonly vpc: ec2.Vpc;
   readonly lambdaSecurityGroup: ec2.SecurityGroup;
   readonly databaseSecurityGroup: ec2.SecurityGroup;
-  /** For the StatusCheckFailed alarm of the NAT instance (MonitoringStack). */
-  readonly natInstanceIds: readonly string[];
 
   constructor(scope: Construct, id: string, props: NetworkStackProps) {
     super(scope, id, props);
@@ -60,7 +58,6 @@ export class NetworkStack extends Stack {
         },
       },
     });
-    this.natInstanceIds = nat.configuredGateways.map((gateway) => gateway.gatewayId);
     // The NAT only forwards traffic that starts inside the VPC.
     nat.connections.allowFrom(
       ec2.Peer.ipv4(VPC_CIDR),
