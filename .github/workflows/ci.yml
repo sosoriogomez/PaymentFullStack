@@ -18,15 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Forbidden words
-        env:
-          FORBIDDEN_WORDS: ${{ secrets.FORBIDDEN_WORDS }}
-        run: |
-          test -n "$FORBIDDEN_WORDS" || { echo "::error::FORBIDDEN_WORDS secret is missing"; exit 1; }
-          # -l prints only file names, so the log never reveals the forbidden word.
-          if git grep -I -i -l -E "$FORBIDDEN_WORDS"; then
-            echo "::error::A forbidden word was found in the files listed above"; exit 1
-          fi
       - name: Key patterns
         run: |
           if git grep -I -n -E '(pub|prv)_(test|prod|stag[a-z]*)_[A-Za-z0-9]+|_(integrity|events)_[A-Za-z0-9]{10,}'; then

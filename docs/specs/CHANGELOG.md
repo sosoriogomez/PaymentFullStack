@@ -78,6 +78,7 @@ Criterio: se conserva todo lo que mejora la app que pide el enunciado (robustez 
 | S-01 | CL-08, CL-07, overview | Se retira `MonitoringStack`: alarmas de CloudWatch, tópico SNS, presupuesto de AWS Budgets y dashboard, junto con la variable `ALARM_EMAIL`. Los costos estimados pasan a CL-09 | Es una funcionalidad nueva de operación; el enunciado pide publicar la app, no monitorearla. Los logs de CloudWatch se mantienen |
 | S-02 | FE-10, CL-06 | Lighthouse deja de ser un job de CI (que además necesitaba un servidor de datos simulados) y pasa a ser una medición manual con los resultados en el README | Da la misma evidencia para "imágenes que cargan rápido" sin agregar infraestructura de CI |
 | S-03 | CL-06 | Se retira Dependabot (`dependabot.yml`). La revisión de dependencias queda en `npm audit` dentro del CI | Sus PRs automáticos (varios saltos de versión mayor sin probar) no aportan a la entrega y ensucian el historial de PRs |
+| S-04 | CL-06 | Se retira la verificación de palabras prohibidas del CI y su secreto `FORBIDDEN_WORDS`. La regla de nombres se mantiene y se revisa en la checklist de cada PR; la guarda de patrones de llaves sigue en CI | Decisión del autor: no mantener un secreto solo para esa verificación |
 
 ---
 
