@@ -22,6 +22,8 @@ export const envSchema = z
       .default('info'),
     CORS_ALLOWED_ORIGINS: commaSeparatedList,
     ORIGIN_VERIFY_SECRET: z.string().min(16).optional(),
+    RATE_LIMIT_PER_MINUTE: integer(1).default(60),
+    PAYMENT_RATE_LIMIT_PER_MINUTE: integer(1).default(10),
 
     DATABASE_URL: z.url().optional(),
     DB_HOST: z.string().optional(),
