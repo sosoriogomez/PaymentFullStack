@@ -30,7 +30,6 @@ export interface StageConfig {
   readonly database: DatabaseStageConfig;
   readonly reconcile: { readonly rate: Duration };
   readonly logRetention: RetentionDays;
-  readonly monthlyBudgetUsd: number;
 }
 
 export const STAGES: Readonly<Record<StageName, StageConfig>> = {
@@ -53,7 +52,6 @@ export const STAGES: Readonly<Record<StageName, StageConfig>> = {
     },
     reconcile: { rate: Duration.minutes(5) },
     logRetention: RetentionDays.TWO_WEEKS,
-    monthlyBudgetUsd: 10,
   },
 };
 

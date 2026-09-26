@@ -44,7 +44,6 @@ jobs:
           npx cdk deploy --all --require-approval never --outputs-file outputs.json
           -c stage=${{ env.STAGE }}
           -c pgHost=${{ vars.PG_HOST }}
-          -c alarmEmail=${{ vars.ALARM_EMAIL }}
 
       # The new code is already live here: migrations must be expand/contract (I-16).
       - name: Run migrations and seed
