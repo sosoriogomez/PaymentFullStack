@@ -1,0 +1,78 @@
+@layer components {
+  /* Container query: the card adapts to the width it gets, not to the viewport. */
+  .card {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
+    transition:
+      box-shadow var(--duration-base) var(--ease-standard),
+      transform var(--duration-base) var(--ease-standard);
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-2);
+  }
+
+  .body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4);
+  }
+
+  .heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .name {
+    font-size: var(--text-lg);
+  }
+
+  /* Three lines at most: long descriptions never push the price out of view. */
+  .description {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+  .price {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Pushed to the bottom: the call to action lines up across a row of cards. */
+  .actions {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: auto;
+  }
+
+  @container (min-width: 420px) {
+    .actions {
+      grid-template-columns: auto 1fr;
+      align-items: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .card:hover {
+      transform: translateY(-2px);
+    }
+  }
+}

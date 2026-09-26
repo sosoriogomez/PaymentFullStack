@@ -29,11 +29,48 @@
     text-decoration: none;
   }
 
+  .logo {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .logo rect {
+    fill: var(--color-accent);
+  }
+
+  .logo path {
+    fill: none;
+    stroke: var(--color-on-accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .skipLink {
+    position: absolute;
+    inset-inline-start: var(--space-2);
+    top: var(--space-2);
+    z-index: var(--z-toast);
+    padding: var(--space-2) var(--space-4);
+    color: var(--color-on-accent);
+    background: var(--color-accent);
+    border-radius: var(--radius-md);
+    transform: translateY(-200%);
+  }
+
+  .skipLink:focus-visible {
+    transform: none;
+  }
+
   .main {
     width: 100%;
     max-width: var(--content-max-width);
     margin-inline: auto;
     padding: var(--space-6) var(--gutter) var(--space-12);
+  }
+
+  .main:focus {
+    outline: none;
   }
 
   .footer {
