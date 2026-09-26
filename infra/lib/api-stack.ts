@@ -6,6 +6,8 @@ import type * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import type * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as scheduler from 'aws-cdk-lib/aws-scheduler';
+import * as targets from 'aws-cdk-lib/aws-scheduler-targets';
 import type * as rds from 'aws-cdk-lib/aws-rds';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { NagSuppressions } from 'cdk-nag';
@@ -36,11 +38,19 @@ const ACCESS_LOG_FORMAT = AccessLogFormat.custom(
   }),
 );
 
-/** Checkout API: Lambdas (HTTP and migrations) behind an HTTP API that only CloudFront should call. */
+/** A reconciliation run takes seconds; the schedule gives up on a run older than this. */
+const RECONCILE_MAX_EVENT_AGE = Duration.minutes(4);
+
+/**
+ * Checkout API: Lambdas (HTTP, migrations and the scheduled reconciliation) behind an HTTP API
+ * that only CloudFront should call.
+ */
 export class ApiStack extends Stack {
   readonly httpApi: apigwv2.HttpApi;
   readonly apiFunction: lambda.Function;
   readonly migrateFunction: lambda.Function;
+  readonly reconcileFunction: lambda.Function;
+  readonly reconcileSchedule: scheduler.Schedule;
   readonly originVerifySecret: secretsmanager.Secret;
   readonly workerEnvironment: Readonly<Record<string, string>>;
 
@@ -76,7 +86,19 @@ export class ApiStack extends Stack {
         timeout: Duration.minutes(5),
       },
     ).function;
+    this.reconcileFunction = this.createFunction(
+      props,
+      'ReconcileLambda',
+      'reconcile',
+      'reconcile.handler',
+      {
+        description: 'Syncs PENDING transactions with the gateway (scheduled, C-03, ADR-007)',
+        environment: this.workerEnvironment,
+        timeout: Duration.minutes(2),
+      },
+    ).function;
     this.originVerifySecret.grantRead(this.apiFunction);
+    this.reconcileSchedule = this.createReconcileSchedule(config);
 
     this.httpApi = this.createHttpApi(config);
     this.outputs();
@@ -149,6 +171,19 @@ export class ApiStack extends Stack {
     return lambdaConstruct;
   }
 
+  /** Every PENDING reaches a final status even if the customer closed the page (C-03). */
+  private createReconcileSchedule(config: StageConfig): scheduler.Schedule {
+    return new scheduler.Schedule(this, 'ReconcileSchedule', {
+      scheduleName: resourceName(config, 'reconcile'),
+      description: 'Reconciles PENDING transactions with the payment gateway',
+      schedule: scheduler.ScheduleExpression.rate(config.reconcile.rate),
+      target: new targets.LambdaInvoke(this.reconcileFunction, {
+        retryAttempts: 0, // the next run retries anyway
+        maxEventAge: RECONCILE_MAX_EVENT_AGE,
+      }),
+    });
+  }
+
   private createHttpApi(config: StageConfig): apigwv2.HttpApi {
     const httpApi = new apigwv2.HttpApi(this, 'HttpApi', {
       apiName: resourceName(config, 'http-api'),
@@ -184,6 +219,7 @@ export class ApiStack extends Stack {
     new CfnOutput(this, 'ApiEndpoint', { value: this.httpApi.apiEndpoint });
     new CfnOutput(this, 'ApiFunctionName', { value: this.apiFunction.functionName });
     new CfnOutput(this, 'MigrateFunctionName', { value: this.migrateFunction.functionName });
+    new CfnOutput(this, 'ReconcileFunctionName', { value: this.reconcileFunction.functionName });
   }
 
   private justifyFindings(): void {
