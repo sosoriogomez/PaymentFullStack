@@ -1,6 +1,6 @@
 /** @type {import('jest').Config} */
 module.exports = {
-  testEnvironment: 'jsdom',
+  testEnvironment: '<rootDir>/test/setup/jsdom-with-fetch.environment.ts',
   setupFiles: ['<rootDir>/test/setup/polyfills.ts'],
   setupFilesAfterEnv: ['<rootDir>/test/setup/jest-dom.ts'],
   testMatch: ['<rootDir>/src/**/*.test.{ts,tsx}', '<rootDir>/test/**/*.test.{ts,tsx}'],
