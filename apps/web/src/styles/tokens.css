@@ -1,0 +1,123 @@
+/* Design tokens: única fuente de colores, espaciado, tipografía, radios, sombras y tiempos. */
+@layer tokens {
+  :root {
+    color-scheme: light dark;
+
+    /* Color (semántico) */
+    --color-bg: #f5f6f8;
+    --color-surface: #fff;
+    --color-surface-muted: #eef0f3;
+    --color-surface-raised: #fff;
+    --color-text: #15171c;
+    --color-text-muted: #5a6170;
+    --color-border: #d6dae1;
+    --color-border-strong: #9aa1ad;
+    --color-accent: #0d63d6;
+    --color-accent-strong: #0a4fae;
+    --color-on-accent: #fff;
+    --color-accent-soft: #e5efff;
+    --color-success: #16733a;
+    --color-success-soft: #e3f4e9;
+    --color-danger: #b42318;
+    --color-danger-soft: #fdecea;
+    --color-warning: #8a5a00;
+    --color-warning-soft: #fff4d6;
+    --color-focus: #0d63d6;
+    --color-scrim: rgb(10 12 16 / 55%);
+    --color-skeleton: #e4e7ec;
+    --color-skeleton-shine: #f2f4f7;
+
+    /* Espaciado (escala de 4 pt) */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --gutter: clamp(var(--space-4), 4vw, var(--space-8));
+
+    /* Tipografía fluida */
+    --font-sans: system-ui, -apple-system, 'Segoe UI', roboto, 'Helvetica Neue', arial, sans-serif;
+    --font-mono: ui-monospace, 'SFMono-Regular', menlo, consolas, monospace;
+    --text-xs: clamp(0.75rem, 0.72rem + 0.1vw, 0.8rem);
+    --text-sm: clamp(0.875rem, 0.85rem + 0.1vw, 0.925rem);
+    --text-md: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+    --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+    --text-xl: clamp(1.375rem, 1.25rem + 0.6vw, 1.625rem);
+    --text-2xl: clamp(1.75rem, 1.5rem + 1.2vw, 2.25rem);
+    --leading-tight: 1.2;
+    --leading-normal: 1.5;
+    --weight-regular: 400;
+    --weight-medium: 500;
+    --weight-bold: 700;
+
+    /* Forma */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-pill: 999px;
+    --border-width: 1px;
+    --shadow-1: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 10%);
+    --shadow-2: 0 4px 8px -2px rgb(16 24 40 / 10%), 0 2px 4px -2px rgb(16 24 40 / 6%);
+    --shadow-3: 0 20px 24px -4px rgb(16 24 40 / 10%), 0 8px 8px -4px rgb(16 24 40 / 4%);
+
+    /* Movimiento */
+    --duration-fast: 150ms;
+    --duration-base: 250ms;
+    --duration-slow: 400ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-emphasized: cubic-bezier(0.3, 0, 0, 1.15);
+
+    /* Capas y layout */
+    --z-header: 10;
+    --z-backdrop: 100;
+    --z-modal: 200;
+    --z-toast: 300;
+    --touch-target: 44px;
+    --content-max-width: 72rem;
+    --focus-ring: 0 0 0 3px var(--color-surface), 0 0 0 5px var(--color-focus);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-bg: #0f1115;
+      --color-surface: #171a20;
+      --color-surface-muted: #20242c;
+      --color-surface-raised: #1d2128;
+      --color-text: #eef0f4;
+      --color-text-muted: #a3a9b6;
+      --color-border: #2e343f;
+      --color-border-strong: #4a5261;
+      --color-accent: #5b9dff;
+      --color-accent-strong: #8ab8ff;
+      --color-on-accent: #0b1220;
+      --color-accent-soft: #16243d;
+      --color-success: #5fd08a;
+      --color-success-soft: #13291c;
+      --color-danger: #ff8a80;
+      --color-danger-soft: #3a1714;
+      --color-warning: #f2c14e;
+      --color-warning-soft: #33280d;
+      --color-focus: #8ab8ff;
+      --color-scrim: rgb(0 0 0 / 65%);
+      --color-skeleton: #232830;
+      --color-skeleton-shine: #2c323c;
+      --shadow-1: 0 1px 2px rgb(0 0 0 / 40%);
+      --shadow-2: 0 4px 10px rgb(0 0 0 / 45%);
+      --shadow-3: 0 20px 32px rgb(0 0 0 / 55%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --duration-fast: 0ms;
+      --duration-base: 0ms;
+      --duration-slow: 0ms;
+    }
+  }
+}
