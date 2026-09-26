@@ -1,7 +1,21 @@
-import { inCents, type OrderAmountsInCents } from '../../../checkout/domain/order-amounts';
+import { inCents } from '../../../checkout/domain/order-amounts';
 import { type TransactionView } from '../../application/transaction-views';
-import { type CardSummary } from '../../domain/transaction';
 import { type TransactionStatus } from '../../domain/transaction-status';
+
+/** Amounts in integer cents; the API computed them (the client never sends amounts). */
+export class TransactionAmountsResponse {
+  readonly product!: number;
+  readonly baseFee!: number;
+  readonly deliveryFee!: number;
+  readonly total!: number;
+  readonly currency!: string;
+}
+
+/** Only brand and last four digits, as reported by the gateway. */
+export class CardResponse {
+  readonly brand!: string;
+  readonly lastFour!: string;
+}
 
 export class TransactionProductResponse {
   readonly id!: string;
@@ -15,9 +29,9 @@ export class TransactionResponse {
   readonly reference!: string;
   readonly status!: TransactionStatus;
   readonly statusMessage!: string | null;
-  readonly amounts!: OrderAmountsInCents;
+  readonly amounts!: TransactionAmountsResponse;
   readonly product!: TransactionProductResponse;
-  readonly card!: CardSummary | null;
+  readonly card!: CardResponse | null;
   readonly deliveryId!: string | null;
   readonly createdAt!: string;
 

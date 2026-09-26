@@ -1,10 +1,12 @@
 import { Body, Controller, Get, HttpStatus, Param, Post, Query, Res } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { type Response } from 'express';
 import {
   IDEMPOTENT_REPLAYED_HEADER,
   IdempotencyKey,
 } from '../../../../shared/infrastructure/http/idempotency-key';
 import { PaymentRateLimit } from '../../../../shared/infrastructure/http/security/rate-limit';
+import { ApiProblems } from '../../../../shared/infrastructure/http/openapi';
 import { unwrapOrThrow } from '../../../../shared/infrastructure/http/unwrap';
 import { uuidParam } from '../../../../shared/infrastructure/http/uuid-param';
 import { CreateTransaction } from '../../application/create-transaction.use-case';
@@ -16,7 +18,10 @@ import {
   toCreateTransactionCommand,
 } from './create-transaction.request';
 import { TransactionResponse } from './transaction.response';
+import { ApiCreateTransaction } from './transactions.openapi';
 
+@ApiTags('transactions')
+@ApiProblems(429)
 @Controller({ path: 'transactions', version: '1' })
 export class TransactionsController {
   constructor(
@@ -29,6 +34,7 @@ export class TransactionsController {
    * 201 when created (even if the payment failed: the resource exists in ERROR); 200 with
    * `Idempotent-Replayed` when the key was already used for the same purchase (I-05).
    */
+  @ApiCreateTransaction()
   @Post()
   @PaymentRateLimit()
   async create(
@@ -47,6 +53,10 @@ export class TransactionsController {
   }
 
   /** `?idempotencyKey=`: recovery after a refresh while the POST was in flight (C-04). */
+  @ApiOperation({
+    summary: 'The transaction created with an Idempotency-Key (recovery after a refresh)',
+  })
+  @ApiProblems(400, 404)
   @Get()
   async findByKey(@Query() query: FindTransactionQuery): Promise<TransactionResponse> {
     const view = unwrapOrThrow(
@@ -56,6 +66,10 @@ export class TransactionsController {
   }
 
   /** Status of a transaction; a PENDING one is synced with the gateway first (polling). */
+  @ApiOperation({
+    summary: 'Status of a transaction; a PENDING one is synced with the gateway first',
+  })
+  @ApiProblems(400, 404)
   @Get(':id')
   async get(@Param('id', uuidParam('id')) id: string): Promise<TransactionResponse> {
     return TransactionResponse.from(unwrapOrThrow(await this.getTransaction.execute(id)));
