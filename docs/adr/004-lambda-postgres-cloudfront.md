@@ -28,6 +28,6 @@ Hay que publicar la SPA y la API en AWS por HTTPS, con un solo link entregable, 
 
 ## Consecuencias
 
-- La NAT instance es un punto único de falla aceptable para la evaluación; hay alarma de `StatusCheckFailed` (CL-08).
+- La NAT instance es un punto único de falla aceptable para la evaluación.
 - Los cold starts (Nest + TypeORM + VPC) rondan 1–3 s; la app se crea una vez por contenedor.
 - `cdk destroy --all` elimina todo salvo el snapshot final de RDS y el bucket web (`RETAIN`), que se borran a mano.

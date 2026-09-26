@@ -6,7 +6,6 @@ import { requiredContext } from '../lib/config/context';
 import { lambdaBundle } from '../lib/config/lambda-code';
 import { resourceName, stageConfig } from '../lib/config/stage-config';
 import { DatabaseStack } from '../lib/database-stack';
-import { MonitoringStack } from '../lib/monitoring-stack';
 import { NetworkStack } from '../lib/network-stack';
 import { WebStack } from '../lib/web-stack';
 
@@ -15,8 +14,6 @@ const config = stageConfig(app.node.tryGetContext('stage'));
 const env = { account: process.env.CDK_DEFAULT_ACCOUNT, region: config.region };
 // Host of the payment gateway for the CSP: comes from a GitHub variable, never from the code.
 const paymentGatewayHost = requiredContext(app, 'pgHost');
-// Receives the alarms and budget alerts: a GitHub variable too.
-const alarmEmail = requiredContext(app, 'alarmEmail');
 
 const network = new NetworkStack(app, resourceName(config, 'network'), { config, env });
 const database = new DatabaseStack(app, resourceName(config, 'database'), {
@@ -39,17 +36,6 @@ new WebStack(app, resourceName(config, 'web'), {
   httpApi: api.httpApi,
   originVerifySecret: api.originVerifySecret,
   paymentGatewayHost,
-});
-
-new MonitoringStack(app, resourceName(config, 'monitoring'), {
-  config,
-  env,
-  alarmEmail,
-  apiFunction: api.apiFunction,
-  reconcileFunction: api.reconcileFunction,
-  httpApi: api.httpApi,
-  database: database.instance,
-  natInstanceIds: network.natInstanceIds,
 });
 
 applyProjectAspects(app, config);

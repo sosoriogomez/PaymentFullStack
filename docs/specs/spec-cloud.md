@@ -1,6 +1,6 @@
 # Spec Cloud — Infraestructura AWS, CI/CD y seguridad
 
-> **Versión 1.1** — incorpora las correcciones de la revisión (ver [`CHANGELOG.md`](./CHANGELOG.md); los IDs `C-xx`/`I-xx`/`M-xx` remiten a ese registro).
+> **Versión 1.2** — incorpora las correcciones de la revisión y el ajuste de alcance S-01 (ver [`CHANGELOG.md`](./CHANGELOG.md); los IDs `C-xx`/`I-xx`/`M-xx` remiten a ese registro).
 
 > **Regla de nombres:** el repositorio es público y **no puede contener el nombre de la compañía evaluadora**. Recursos, stacks, variables y workflows usan nombres neutros (`checkout-*`, `PG_*`). La URL/host de la pasarela y sus llaves llegan desde GitHub Secrets/Variables y SSM, nunca desde el código.
 
@@ -64,8 +64,8 @@ Región: `us-east-1`.
 | Bundling Lambda | `apps/api` genera `dist-lambda/` (tsc + esbuild, ver spec-backend BE-12); CDK usa `lambda.Function` con `Code.fromAsset`, `Runtime.NODEJS_24_X`, `Architecture.ARM_64` (C-01, I-08) |
 | Tareas programadas | EventBridge Scheduler (`aws-cdk-lib/aws-scheduler` + `aws-scheduler-targets`) |
 | CI/CD | GitHub Actions + **OIDC** hacia AWS (sin access keys de larga duración) |
-| Monitoreo | CloudWatch Logs/Alarms + SNS (email) + AWS Budgets |
-| Verificación | Mozilla Observatory, SSL Labs, Lighthouse CI |
+| Logs | CloudWatch Logs (Lambdas, access logs de API Gateway, VPC Flow Logs) con retención corta |
+| Verificación | Mozilla Observatory, SSL Labs, Lighthouse (manual) |
 
 ---
 
@@ -82,7 +82,6 @@ infra/
 │   ├── database-stack.ts
 │   ├── api-stack.ts
 │   ├── web-stack.ts
-│   ├── monitoring-stack.ts
 │   └── constructs/                  # security-headers-policy.ts, spa-rewrite-function.ts, api-lambda.ts, scheduled-reconciler.ts
 ├── functions/spa-rewrite.js         # CloudFront Function
 ├── scripts/put-parameters.sh        # carga secretos a SSM desde variables locales (no versionadas)
@@ -178,7 +177,7 @@ Cada feature = **rama `feat/cl-XX-...` desde `main` + PR hacia `main`**. DoD com
 
 1. `npm ci` con caché; jobs en paralelo `api`, `web`, `infra`.
 2. **api:** lint → typecheck → `dependency-cruiser` → `jest --coverage` (umbral 85 %; Testcontainers usa el Docker del runner) → `build:lambda` (tsc + esbuild) → smoke `node -e "require('./dist-lambda/lambda.js')"`.
-3. **web:** lint → stylelint → typecheck → `jest --coverage` → build → **Lighthouse CI** sobre `dist` (móvil, budgets de FE-10).
+3. **web:** lint → stylelint → typecheck → `jest --coverage` → build.
 4. **infra:** `cdk synth` (con `cdk-nag`; necesita el artefacto `dist-lambda/` del job api o un placeholder) → tests de assertions.
 5. **Guardas:** búsqueda de palabras prohibidas usando el secreto `FORBIDDEN_WORDS` (así la palabra no queda escrita en el repo) y de patrones de llaves; `npm audit --omit=dev --audit-level=high`.
 6. Publicar reportes de cobertura como artefactos.
@@ -200,12 +199,11 @@ Branch protection en `main`: PR obligatorio + checks en verde. `dependabot.yml` 
 
 Los outputs de CDK (URL de CloudFront, bucket, id de distribución, nombre de la Lambda de migración) se exportan con `--outputs-file` y se leen en los pasos siguientes.
 
-### CL-08 · Observabilidad y control de costos
+### CL-09 · Verificación de seguridad y documentación de despliegue
 
-- Alarmas CloudWatch → SNS (email): errores de Lambda API > 0 en 5 min, throttles > 0, API Gateway 5xx > 1 %, duración p95 > 5 s, errores de `ReconcileFunction` > 0 en 15 min, RDS CPU > 80 %, `FreeStorageSpace` < 2 GB, NAT instance `StatusCheckFailed`.
-- Retención de logs 14 días.
-- **AWS Budgets**: alerta al 50/80/100 % de USD 10/mes.
-- Dashboard CloudWatch mínimo (invocaciones, errores, latencia, conexiones DB).
+- Correr Mozilla Observatory, SSL Labs y securityheaders.com sobre la URL de CloudFront; guardar capturas en `docs/security/`.
+- Checklist OWASP de infraestructura en `docs/security/README.md` (M-02): TLS en todos los saltos (cliente→CF, CF→API GW, Lambda→RDS con `force_ssl`, Lambda→pasarela), DB privada, mínimo privilegio IAM, sin llaves estáticas en CI, secretos en SSM, logs sin PII.
+- Sección README "Despliegue": diagrama, URLs (app, Swagger), cómo desplegar desde cero (bootstrap → put-parameters → push a main), cómo destruir, costos.
 
 Costo estimado del periodo de evaluación (aprox., depende de si la cuenta tiene free tier clásico o créditos del plan gratuito):
 
@@ -217,11 +215,5 @@ Costo estimado del periodo de evaluación (aprox., depende de si la cuenta tiene
 | Lambda, API Gateway, CloudFront, S3, SSM, EventBridge Scheduler | ~USD 0 al volumen de la prueba |
 
 Tras la evaluación: `cdk destroy --all` (documentado).
-
-### CL-09 · Verificación de seguridad y documentación de despliegue
-
-- Correr Mozilla Observatory, SSL Labs y securityheaders.com sobre la URL de CloudFront; guardar capturas en `docs/security/`.
-- Checklist OWASP de infraestructura en `docs/security/README.md` (M-02): TLS en todos los saltos (cliente→CF, CF→API GW, Lambda→RDS con `force_ssl`, Lambda→pasarela), DB privada, mínimo privilegio IAM, sin llaves estáticas en CI, secretos en SSM, logs sin PII.
-- Sección README "Despliegue": diagrama, URLs (app, Swagger), cómo desplegar desde cero (bootstrap → put-parameters → push a main), cómo destruir, costos.
 
 **Aceptación:** los tres links (app, Swagger, repo) funcionan desde un móvil real; flujo de pago aprobado y rechazado completado en producción con las tarjetas de prueba de la sandbox.
