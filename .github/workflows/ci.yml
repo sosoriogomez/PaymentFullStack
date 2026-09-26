@@ -109,6 +109,7 @@ jobs:
   infra:
     name: infra
     runs-on: ubuntu-latest
+    needs: api
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -119,6 +120,12 @@ jobs:
       - run: npm run lint -w infra
       - run: npm run typecheck -w infra
       - run: npm test -w infra
+      - uses: actions/download-artifact@v4
+        with:
+          name: api-lambda-bundle
+          path: apps/api/dist-lambda
+      - name: Synthesize every stack with cdk-nag
+        run: npm run synth -w infra -- -c pgHost=gateway.example
       - name: Coverage summary
         if: always()
         run: node .github/scripts/coverage-summary.mjs infra/coverage/coverage-summary.json "Infra" >> "$GITHUB_STEP_SUMMARY"
