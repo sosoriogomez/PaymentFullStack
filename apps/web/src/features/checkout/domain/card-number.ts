@@ -72,4 +72,10 @@ export const caretAfterDigits = (formatted: string, digitsBeforeCaret: number): 
   return formatted.length;
 };
 
+/** Brand name as reported by the gateway (`VISA`, `MASTERCARD`, …) → one we can draw. */
+export const toCardBrand = (name: string): CardBrand => {
+  const upper = name.toUpperCase();
+  return upper === 'VISA' || upper === 'MASTERCARD' ? upper : 'UNKNOWN';
+};
+
 export const lastFourOf = (value: string): string => onlyDigits(value).slice(-4);

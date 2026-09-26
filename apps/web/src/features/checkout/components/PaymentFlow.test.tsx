@@ -96,7 +96,8 @@ describe('PaymentFlow', () => {
       expect(store.getState().checkout.step).toBe('SUMMARY');
     });
     expect(services.cardTokenizer.tokenize).toHaveBeenCalledTimes(1);
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: es.checkout.modalTitle })).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: es.summary.title })).toBeInTheDocument();
   });
 
   it('should show the error inside the dialog and keep what was typed', async () => {
@@ -141,7 +142,7 @@ describe('PaymentFlow', () => {
     expect(JSON.stringify(store.getState())).not.toContain('4242 4242');
   });
 
-  it('should prefill the saved drafts and warn when the card must be entered again', () => {
+  it('should prefill the saved drafts and warn when the card must be entered again', async () => {
     renderFlow({
       contact: { fullName: 'Ana Pérez', email: 'ana@mail.com', phone: '3001234567' },
       cardReentryRequired: true,
@@ -149,6 +150,7 @@ describe('PaymentFlow', () => {
 
     expect(screen.getByLabelText(delivery.fullName)).toHaveValue('Ana Pérez');
     expect(screen.getByText(card.reentry)).toBeInTheDocument();
+    expect(await screen.findByRole('checkbox', { name: /reglamento/ })).not.toBeChecked();
   });
 
   it('should close back to the product', async () => {
