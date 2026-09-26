@@ -1,22 +1,20 @@
-import { type INestApplication } from '@nestjs/common';
-import request from 'supertest';
 import { ProbeController } from '../support/probe.controller';
-import { createTestApp } from '../support/test-app';
+import { createTestApp, type TestApp } from '../support/test-app';
 
 const UUID = /^[0-9a-f-]{36}$/;
 
 describe('Problem Details (RFC 9457) and request ids', () => {
-  let app: INestApplication;
+  let testApp: TestApp;
 
   beforeAll(async () => {
-    app = await createTestApp({ controllers: [ProbeController] });
+    testApp = await createTestApp({ controllers: [ProbeController] });
   });
 
   afterAll(async () => {
-    await app.close();
+    await testApp.close();
   });
 
-  const api = () => request(app.getHttpServer());
+  const api = () => testApp.api();
 
   it('should hide unexpected errors behind a 500 problem without internals', async () => {
     const response = await api().get('/api/v1/__probe/boom');
@@ -115,8 +113,11 @@ describe('Problem Details (RFC 9457) and request ids', () => {
   it('should not expose the message of framework 5xx exceptions', async () => {
     const response = await api().get('/api/v1/__probe/bad-gateway-exception');
 
-    expect(response.status).toBe(500);
-    expect(response.body.detail).toBe('An unexpected error occurred');
+    expect(response.status).toBe(502);
+    expect(response.body).toMatchObject({
+      code: 'BAD_GATEWAY',
+      detail: 'An unexpected error occurred',
+    });
   });
 
   it('should reuse a valid incoming request id and echo it', async () => {

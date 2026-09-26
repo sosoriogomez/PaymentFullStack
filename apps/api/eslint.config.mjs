@@ -31,6 +31,11 @@ export default tseslint.config(
     },
   },
   {
+    // Migrations are declarative SQL: splitting them only hides the schema.
+    files: ['src/database/migrations/**/*.ts'],
+    rules: { 'max-lines-per-function': 'off' },
+  },
+  {
     files: ['**/*.spec.ts', 'test/**/*.ts'],
     rules: {
       'max-lines-per-function': 'off',
