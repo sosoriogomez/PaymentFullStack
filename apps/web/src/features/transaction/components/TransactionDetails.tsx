@@ -21,7 +21,7 @@ export function TransactionDetails({ transaction }: { readonly transaction: Tran
       {rows.map(([label, value]) => (
         <div key={label} className={styles.detailRow}>
           <dt>{label}</dt>
-          <dd>{value}</dd>
+          <dd className={label === texts.reference ? styles.reference : undefined}>{value}</dd>
         </div>
       ))}
     </dl>

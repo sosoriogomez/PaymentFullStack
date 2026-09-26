@@ -71,6 +71,12 @@
     overflow-wrap: anywhere;
   }
 
+  .detailRow .reference {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
+
   .delivery {
     display: grid;
     gap: var(--space-1);
