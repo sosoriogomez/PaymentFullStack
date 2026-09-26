@@ -11,5 +11,8 @@ export const testEnv = (
   PG_PRIVATE_KEY: 'test-private-key',
   PG_INTEGRITY_SECRET: 'test-integrity-secret',
   PG_EVENTS_SECRET: 'test-events-secret',
+  // Suites send many requests from the same client: rate limits get their own e2e test.
+  RATE_LIMIT_PER_MINUTE: '10000',
+  PAYMENT_RATE_LIMIT_PER_MINUTE: '10000',
   ...overrides,
 });
