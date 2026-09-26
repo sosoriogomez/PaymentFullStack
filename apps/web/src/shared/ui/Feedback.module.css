@@ -1,0 +1,96 @@
+@layer components {
+  .alert {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-3);
+    align-items: start;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    border-inline-start: 4px solid currentcolor;
+    font-size: var(--text-sm);
+  }
+
+  .alert::before {
+    content: '';
+    width: 0.625rem;
+    height: 0.625rem;
+    margin-top: 0.35rem;
+    border-radius: 50%;
+    background: currentcolor;
+  }
+
+  .alertBody {
+    color: var(--color-text);
+  }
+
+  .info {
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+
+  .success {
+    color: var(--color-success);
+    background: var(--color-success-soft);
+  }
+
+  .warning {
+    color: var(--color-warning);
+    background: var(--color-warning-soft);
+  }
+
+  .error {
+    color: var(--color-danger);
+    background: var(--color-danger-soft);
+  }
+
+  .spinner {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-text-muted);
+  }
+
+  .spinnerMark {
+    width: var(--spinner-size, 2rem);
+    height: var(--spinner-size, 2rem);
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: rotate 800ms linear infinite;
+  }
+
+  .skeleton {
+    display: block;
+    border-radius: var(--radius-md);
+    background: linear-gradient(
+        90deg,
+        var(--color-skeleton) 0%,
+        var(--color-skeleton-shine) 50%,
+        var(--color-skeleton) 100%
+      )
+      0 0 / 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+
+  @keyframes rotate {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes shimmer {
+    to {
+      background-position: -200% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spinnerMark {
+      animation-duration: 2.4s;
+    }
+
+    .skeleton {
+      animation: none;
+    }
+  }
+}
