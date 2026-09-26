@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { checkoutStarted } from '@/features/checkout/checkout.slice';
+import { selectProductNotice } from '@/features/checkout/checkout.selectors';
 import { CheckoutFlow } from '@/features/checkout/components/PaymentFlow';
 import { es } from '@/shared/i18n/es';
 import { Alert } from '@/shared/ui/Alert';
@@ -17,6 +18,7 @@ export function ProductPage() {
   const products = useAppSelector(selectProducts);
   const status = useAppSelector(selectCatalogStatus);
   const error = useAppSelector(selectCatalogError);
+  const notice = useAppSelector(selectProductNotice);
 
   useEffect(() => {
     if (status === 'idle') void dispatch(fetchProducts());
@@ -32,6 +34,7 @@ export function ProductPage() {
       <h1 id="catalog-title" className={styles.title}>
         {es.catalog.title}
       </h1>
+      {notice ? <Alert tone="warning">{notice.message}</Alert> : null}
       {status === 'failed' ? (
         <div className={styles.feedback}>
           <Alert tone="error">{error?.message ?? es.catalog.loadError}</Alert>

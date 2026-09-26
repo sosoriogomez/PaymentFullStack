@@ -14,7 +14,7 @@ export interface BackdropProps {
   readonly footer?: ReactNode;
   /** Action next to the front layer title (e.g. "Editar"). */
   readonly headerAction?: ReactNode;
-  readonly onEscape?: () => void;
+  readonly onEscape?: (() => void) | undefined;
   readonly initialFocusRef?: RefObject<HTMLElement | null>;
 }
 

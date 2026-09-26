@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
+import { Navigate } from 'react-router';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { selectCheckoutStep, selectDeliveryDefaults } from '../checkout.selectors';
@@ -10,6 +11,7 @@ import {
   type PaymentFormValues,
 } from '../domain/payment-form-schema';
 import { PaymentModal } from './PaymentModal';
+import { SummaryBackdrop } from './SummaryBackdrop';
 import { useDraftSync } from './useDraftSync';
 
 /**
@@ -34,12 +36,20 @@ export function PaymentFlow() {
         open={step === 'PAYMENT_FORM'}
         onSubmit={(values) => void dispatch(submitPaymentForm(values))}
       />
+      <SummaryBackdrop open={step === 'SUMMARY'} />
     </FormProvider>
   );
 }
 
-/** Mounted by the product page; renders the checkout only while it is in progress. */
+/**
+ * Mounted by the product page; renders the checkout only while it is in progress. Thunks never
+ * navigate: once the payment is sent (PROCESSING) this container moves to the status page.
+ */
 export function CheckoutFlow() {
   const step = useAppSelector(selectCheckoutStep);
+  const transactionId = useAppSelector((state) => state.transaction.current?.id);
+  if (step === 'PROCESSING' && transactionId) {
+    return <Navigate to={`/transactions/${transactionId}`} />;
+  }
   return step === 'PAYMENT_FORM' || step === 'SUMMARY' ? <PaymentFlow /> : null;
 }

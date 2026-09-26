@@ -6,6 +6,7 @@ import {
   lastFourOf,
   luhnCheck,
   onlyDigits,
+  toCardBrand,
 } from './card-number';
 
 describe('luhnCheck', () => {
@@ -97,4 +98,13 @@ describe('caretAfterDigits', () => {
 it('should keep digits and the last four', () => {
   expect(onlyDigits('4242-4242 x')).toBe('42424242');
   expect(lastFourOf('4242 4242 4242 4242')).toBe('4242');
+});
+
+it.each([
+  ['VISA', 'VISA'],
+  ['visa', 'VISA'],
+  ['MASTERCARD', 'MASTERCARD'],
+  ['AMEX', 'UNKNOWN'],
+])('should map the gateway brand %s to %s', (name, brand) => {
+  expect(toCardBrand(name)).toBe(brand);
 });

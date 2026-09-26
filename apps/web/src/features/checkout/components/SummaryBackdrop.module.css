@@ -1,0 +1,58 @@
+@layer components {
+  .context {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+  }
+
+  .breakdown {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .row dd {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .total {
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-width) solid var(--color-border);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+  }
+
+  .details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: var(--space-6);
+    margin-block-start: var(--space-6);
+  }
+
+  .subtitle {
+    margin-block-end: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .muted {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+}
