@@ -18,7 +18,8 @@
     "db:migrate": "nest build && node dist/database/cli.js migrate",
     "db:reset": "nest build && node dist/database/cli.js reset",
     "build:lambda": "nest build && node scripts/bundle-lambda.mjs",
-    "smoke:lambda": "node scripts/smoke-lambda-bundle.mjs"
+    "smoke:lambda": "node scripts/smoke-lambda-bundle.mjs",
+    "pg:smoke": "nest build && node scripts/pg-smoke.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
