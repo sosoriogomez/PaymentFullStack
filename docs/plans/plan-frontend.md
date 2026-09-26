@@ -30,7 +30,7 @@
 | Imágenes | `sharp` (devDependency, script) | Variantes AVIF/WebP/JPG × 320/640/960 |
 | Tests | `jest` 30, `@swc/jest`, `jest-environment-jsdom`, `@testing-library/react` 16, `@testing-library/user-event` 14, `@testing-library/jest-dom` 6, `identity-obj-proxy` | Unit, componentes e integración del flujo |
 | Calidad | `eslint` 9 + `typescript-eslint` + `eslint-plugin-react-hooks` + `eslint-plugin-jsx-a11y` + `eslint-plugin-import`; `stylelint` 16 + `stylelint-config-standard` + `stylelint-config-css-modules`; `prettier`; `husky` + `lint-staged` | Clean code y accesibilidad verificables |
-| Performance | `@lhci/cli` (Lighthouse CI) | Evidencia de imágenes rápidas y sin CLS |
+| Performance | Lighthouse (Chrome DevTools, manual) | Evidencia de imágenes rápidas y sin CLS |
 
 No se usa librería de componentes: el UI kit propio (Modal, Backdrop, TextField…) es parte de lo que se evalúa en CSS y accesibilidad.
 
@@ -320,7 +320,7 @@ Funciones puras de §3.5 con tests de tabla (números de prueba válidos e invá
 
 ### FE-10 · Responsive, CSS, cross-browser y performance — `feat/fe-10-polish`
 
-Revisión en 320, 375×667, 390, 768, 1024 y 1440 px (sin scroll horizontal, sin textos cortados, CTA siempre visible con footer sticky); container queries, `clamp()`, modo oscuro por tokens, `prefers-reduced-motion`; `React.lazy` + prefetch en idle de `PaymentModal` y `TransactionStatusPage`; `lighthouserc.json` (móvil: Performance ≥ 90, Accessibility ≥ 95, LCP < 2.5 s, CLS < 0.1); matriz manual Chrome, Firefox, Safari macOS/iOS y Edge con capturas.
+Revisión en 320, 375×667, 390, 768, 1024 y 1440 px (sin scroll horizontal, sin textos cortados, CTA siempre visible con footer sticky); container queries, `clamp()`, modo oscuro por tokens, `prefers-reduced-motion`; `React.lazy` + prefetch en idle de `PaymentModal` y `TransactionStatusPage`; medición manual con Lighthouse en móvil, registrada en el README (Performance ≥ 90, Accessibility ≥ 95, LCP < 2.5 s, CLS < 0.1); matriz manual Chrome, Firefox, Safari macOS/iOS y Edge con capturas.
 
 ### FE-11 · Cobertura y documentación — `feat/fe-11-coverage-docs`
 
@@ -353,7 +353,7 @@ Test de integración del flujo completo (store real + fakes) para aprobado y rec
 | La sandbox no permite CORS para tokenizar desde el navegador | Spike al inicio de FE-02 + plan B sin cambiar el puerto |
 | Doble cobro por doble click o refresh | Guarda en el thunk + `Idempotency-Key` estable (ADR-006) |
 | Paquetes ESM rompen Jest | `transformIgnorePatterns` y mocks centralizados |
-| CLS o LCP altos por imágenes | Dimensiones explícitas, AVIF/WebP, `fetchPriority` en la primera y Lighthouse CI como gate |
+| CLS o LCP altos por imágenes | Dimensiones explícitas, AVIF/WebP, `fetchPriority` en la primera y medición con Lighthouse antes de entregar |
 | Diferencias entre Safari iOS y Chrome | `dvh` con fallback, safe areas, pruebas en dispositivo real antes de entregar |
 
 ## 7. Definition of Done (todas las features)
