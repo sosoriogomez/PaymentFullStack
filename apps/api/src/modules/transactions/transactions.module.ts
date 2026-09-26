@@ -24,6 +24,10 @@ import {
   type CustomerRepository,
 } from '../customers/domain/customer.repository.port';
 import {
+  PAYMENT_EVENT_VERIFIER,
+  type PaymentEventVerifier,
+} from '../payment-gateway/domain/payment-event.port';
+import {
   PAYMENT_GATEWAY,
   type PaymentGateway,
 } from '../payment-gateway/domain/payment-gateway.port';
@@ -37,6 +41,7 @@ import { CreateTransaction } from './application/create-transaction.use-case';
 import { FinalizeTransaction } from './application/finalize-transaction.use-case';
 import { FindTransactionByIdempotencyKey } from './application/find-transaction-by-idempotency-key.use-case';
 import { GetTransaction } from './application/get-transaction.use-case';
+import { HandlePaymentEvent } from './application/handle-payment-event.use-case';
 import { SyncTransactionStatus } from './application/sync-transaction-status.use-case';
 import { TransactionViews } from './application/transaction-views';
 import { REFERENCE_GENERATOR, type ReferenceGenerator } from './domain/reference-generator.port';
@@ -44,6 +49,7 @@ import {
   TRANSACTION_REPOSITORY,
   type TransactionRepository,
 } from './domain/transaction.repository.port';
+import { PaymentEventsController } from './infrastructure/http/payment-events.controller';
 import { TransactionsController } from './infrastructure/http/transactions.controller';
 import { TypeOrmTransactionRepository } from './infrastructure/persistence/typeorm-transaction.repository';
 import { UlidReferenceGenerator } from './infrastructure/references/ulid-reference-generator';
@@ -56,7 +62,7 @@ import { UlidReferenceGenerator } from './infrastructure/references/ulid-referen
     PaymentGatewayModule,
     DeliveriesModule,
   ],
-  controllers: [TransactionsController],
+  controllers: [TransactionsController, PaymentEventsController],
   providers: [
     {
       provide: TRANSACTION_REPOSITORY,
@@ -159,6 +165,15 @@ import { UlidReferenceGenerator } from './infrastructure/references/ulid-referen
       inject: [SyncTransactionStatus, TransactionViews],
       useFactory: (sync: SyncTransactionStatus, views: TransactionViews) =>
         new GetTransaction(sync, views),
+    },
+    {
+      provide: HandlePaymentEvent,
+      inject: [PAYMENT_EVENT_VERIFIER, TRANSACTION_REPOSITORY, FinalizeTransaction],
+      useFactory: (
+        verifier: PaymentEventVerifier,
+        transactions: TransactionRepository,
+        finalize: FinalizeTransaction,
+      ) => new HandlePaymentEvent(verifier, transactions, finalize),
     },
   ],
   exports: [TRANSACTION_REPOSITORY, FinalizeTransaction, SyncTransactionStatus],
