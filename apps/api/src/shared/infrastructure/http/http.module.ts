@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { NoStoreInterceptor } from './no-store.interceptor';
 import { ProblemDetailsFilter } from './problem-details.filter';
 import { createValidationPipe } from './validation';
 
@@ -8,6 +9,7 @@ import { createValidationPipe } from './validation';
   providers: [
     { provide: APP_FILTER, useClass: ProblemDetailsFilter },
     { provide: APP_PIPE, useFactory: createValidationPipe },
+    { provide: APP_INTERCEPTOR, useClass: NoStoreInterceptor },
   ],
 })
 export class HttpInfrastructureModule {}
