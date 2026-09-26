@@ -61,7 +61,7 @@ Severidad:
 | M-07 | BE §5.2 | Validaciones explícitas: `country ∈ {'CO'}`, moneda COP, teléfono y código postal del destinatario |
 | M-08 | CL-00 | Lista de supresiones esperadas de `cdk-nag`, cada una con su justificación |
 | M-09 | Todos | Convención de ramas: `feat/<area>-<nn>-<slug>` desde `main` y PR hacia `main` |
-| M-10 | BE §2.3 | Mapper de errores exhaustivo (`switch` + `assertNever`): un código nuevo sin mapear rompe el typecheck |
+| M-10 | BE §2.3 | Mapper de errores exhaustivo (tabla con *mapped type* por código): un código nuevo sin mapear rompe el typecheck |
 | M-11 | BE §5.3 | Se aclara por qué el GET con sincronización sigue siendo seguro e idempotente para el cliente |
 | M-12 | BE §5 | Trade-off documentado del upsert de customers por email (checkout de invitado, respuestas enmascaradas) |
 | M-13 | FE §2.3 | Trade-off documentado de persistir borradores con datos personales (TTL de 30 min y borrado al terminar) |

@@ -128,7 +128,7 @@ export type DomainError =
   | { code: 'GATEWAY_REJECTED'; reason: string };
 ```
 
-Un único `domain-error.http-mapper.ts` traduce a HTTP + `application/problem+json` (**RFC 9457**, que reemplaza a RFC 7807 — I-04). El mapper es exhaustivo: un `switch` sobre `code` con `assertNever` en el `default`, de modo que agregar un código sin mapearlo rompe el typecheck.
+Un único `domain-error.http-mapper.ts` traduce a HTTP + `application/problem+json` (**RFC 9457**, que reemplaza a RFC 7807 — I-04). El mapper es exhaustivo: una tabla tipada con un *mapped type* (`{ [C in DomainErrorCode]: … }`), de modo que agregar un código sin mapearlo rompe el typecheck.
 
 | code | HTTP |
 |---|---|
