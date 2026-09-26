@@ -13,3 +13,10 @@ export class QuoteResponse {
   readonly quantity!: number;
   readonly amounts!: AmountsResponse;
 }
+
+export class AcceptanceResponse {
+  readonly acceptanceToken!: string;
+  readonly acceptancePermalink!: string;
+  readonly personalDataAuthToken!: string;
+  readonly personalDataAuthPermalink!: string;
+}
