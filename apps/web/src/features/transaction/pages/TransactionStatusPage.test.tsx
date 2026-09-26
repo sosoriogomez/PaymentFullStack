@@ -124,6 +124,8 @@ describe('TransactionStatusPage', () => {
       expect(router.state.location.pathname).toBe('/');
     });
     expect(store.getState().checkout).toEqual(initialCheckoutState);
+    expect(store.getState().transaction.current).toBeNull();
+    expect(services.api.getTransaction).not.toHaveBeenCalled();
     expect(services.api.listProducts).toHaveBeenCalled();
     expect(services.api.getProductStock).toHaveBeenCalledWith(PRODUCT_ID);
   });
