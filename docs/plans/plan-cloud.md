@@ -168,7 +168,7 @@ jobs:
 - `git grep -l` imprime solo nombres de archivo, así el log no revela la palabra prohibida.
 - `actions/setup-node` con `node-version-file: .nvmrc` y caché de npm; `npm ci` una vez por job (workspaces).
 - Branch protection en `main`: PR obligatorio, checks `guards`, `api`, `web`, `infra` y `audit` en verde.
-- `.github/pull_request_template.md` (Qué / Por qué / Cómo probar / Checklist DoD) y `dependabot.yml` semanal (npm y github-actions).
+- `.github/pull_request_template.md` (Qué / Por qué / Cómo probar / Checklist DoD).
 
 ### 4.2 `deploy.yml` (push a `main` y `workflow_dispatch`)
 
@@ -205,7 +205,7 @@ steps:
 
 ### CL-06 · CI temprano — `feat/cl-06-ci`
 
-Se adelanta a la fase 1 (spec overview) para que todo PR posterior pase por los gates. `ci.yml` con los jobs de §4.1 (los de api/web/infra se activan a medida que existen los proyectos), secreto `FORBIDDEN_WORDS` creado en GitHub, plantilla de PR, `dependabot.yml`, branch protection. **Aceptación:** un PR de prueba con una palabra prohibida o un patrón de llave falla; uno limpio pasa.
+Se adelanta a la fase 1 (spec overview) para que todo PR posterior pase por los gates. `ci.yml` con los jobs de §4.1 (los de api/web/infra se activan a medida que existen los proyectos), secreto `FORBIDDEN_WORDS` creado en GitHub, plantilla de PR, branch protection. **Aceptación:** un PR de prueba con una palabra prohibida o un patrón de llave falla; uno limpio pasa.
 
 ### CL-01 · Red — `feat/cl-01-network`
 
