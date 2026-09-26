@@ -22,7 +22,7 @@
 | Tests IaC | Jest + `aws-cdk-lib/assertions` (`Template`, `Match`, `Annotations`) | Aserciones finas; sin snapshots completos (son frágiles) |
 | CI/CD | GitHub Actions, `aws-actions/configure-aws-credentials` con OIDC | Sin access keys de larga duración |
 | Calidad | ESLint + Prettier compartidos con el monorepo | Mismo estándar que app y API |
-| Verificación | Mozilla Observatory, SSL Labs, securityheaders.com, Lighthouse CI | Evidencia para el README |
+| Verificación | Mozilla Observatory, SSL Labs, securityheaders.com, Lighthouse (manual) | Evidencia para el README |
 
 ---
 
@@ -34,7 +34,6 @@
 bin/bootstrap-oidc.ts ──▶ GithubOidcStack   (manual, una vez)
 
 bin/app.ts ──▶ NetworkStack ──▶ DatabaseStack ──▶ ApiStack ──▶ WebStack
-                                        └──────────────┴──────────┴──▶ MonitoringStack
 ```
 
 - Las referencias entre stacks se pasan **por props tipadas** (`vpc`, `lambdaSecurityGroup`, `database`, `httpApi`, `originSecret`), nunca con nombres de exports escritos a mano.
@@ -56,7 +55,6 @@ export interface StageConfig {
   readonly database: { readonly instanceType: string; readonly allocatedStorageGb: number; readonly backupRetentionDays: number };
   readonly reconcile: { readonly rate: Duration };
   readonly logRetention: RetentionDays;
-  readonly monthlyBudgetUsd: number;
 }
 
 export const STAGES = {
@@ -67,7 +65,6 @@ export const STAGES = {
     database: { instanceType: 't4g.micro', allocatedStorageGb: 20, backupRetentionDays: 1 },
     reconcile: { rate: Duration.minutes(5) },
     logRetention: RetentionDays.TWO_WEEKS,
-    monthlyBudgetUsd: 10,
   },
 } as const satisfies Record<string, StageConfig>;
 ```
@@ -138,13 +135,6 @@ function handler(event) {
   - `httpVersion: HTTP2_AND_3`, `priceClass: PRICE_CLASS_100`, `defaultRootObject: 'index.html'`.
 - Política web: HSTS sin `preload` (I-12), CSP del spec CL-05 con `connect-src 'self' https://<PG_HOST>` (`pgHost` desde contexto ← GitHub Variables), `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, `Cross-Origin-Opener-Policy: same-origin`.
 
-### 3.5 Observabilidad y costos (`MonitoringStack`)
-
-- Tópico SNS con suscripción email (`alarmEmail` desde contexto).
-- Alarmas del spec CL-08 (incluida la de errores de `ReconcileFunction`), `treatMissingData: NOT_BREACHING`.
-- `CfnBudget` mensual de USD 10 con avisos al 50/80/100 %.
-- Dashboard: invocaciones, errores, duración p95, throttles, 5xx de API Gateway, conexiones y CPU de RDS.
-
 ---
 
 ## 4. CI/CD
@@ -170,7 +160,7 @@ jobs:
         run: |
           if git grep -I -n -E '(pub|prv)_(test|prod|stag[a-z]*)_[A-Za-z0-9]+|_(integrity|events)_[A-Za-z0-9]{10,}'; then exit 1; fi
   api:   # lint → typecheck → depcruise → test --coverage (Testcontainers) → build:lambda → smoke require → upload coverage + dist-lambda
-  web:   # lint → stylelint → typecheck → test --coverage → build → lhci autorun → upload coverage
+  web:   # lint → stylelint → typecheck → test --coverage → build → upload coverage
   infra: # needs: api (descarga dist-lambda) → lint → test → cdk synth (cdk-nag)
   audit: # npm audit --omit=dev --audit-level=high
 ```
@@ -192,7 +182,7 @@ steps:
   - uses: aws-actions/configure-aws-credentials@v4
     with: { role-to-assume: "${{ vars.AWS_DEPLOY_ROLE_ARN }}", aws-region: us-east-1 }
   - run: npm run build:lambda -w apps/api
-  - run: npx cdk deploy --all --require-approval never --outputs-file outputs.json -c stage=prod -c pgHost=${{ vars.PG_HOST }} -c alarmEmail=${{ vars.ALARM_EMAIL }}
+  - run: npx cdk deploy --all --require-approval never --outputs-file outputs.json -c stage=prod -c pgHost=${{ vars.PG_HOST }}
     working-directory: infra
   - run: ./infra/scripts/invoke-migrate.sh infra/outputs.json      # falla si FunctionError
   - run: npm run build -w apps/web
@@ -250,17 +240,13 @@ template.hasResourceProperties('AWS::ApiGatewayV2::Stage', {
 
 ### CL-07 · CD — `feat/cl-07-deploy`
 
-`deploy.yml` y scripts de §4.2; GitHub Variables `AWS_DEPLOY_ROLE_ARN`, `PG_HOST`, `PG_BASE_URL`, `PG_PUBLIC_KEY`, `ALARM_EMAIL`. **Aceptación:** push a `main` despliega de punta a punta y el smoke test pasa; un fallo de migración detiene el job antes de publicar el front.
+`deploy.yml` y scripts de §4.2; GitHub Variables `AWS_DEPLOY_ROLE_ARN`, `PG_HOST`, `PG_BASE_URL`, `PG_PUBLIC_KEY`. **Aceptación:** push a `main` despliega de punta a punta y el smoke test pasa; un fallo de migración detiene el job antes de publicar el front.
 
 > **Walking skeleton (fase 4):** CL-01…CL-05 + CL-07 con BE-03/FE-04 listos, para tener la URL pública mostrando el catálogo lo antes posible.
 
 ### CL-04b · Reconciliación programada — dentro de `feat/be-14-reconciliation`
 
-`ScheduledReconciler` + alarma de errores. **Tests:** existe `AWS::Scheduler::Schedule` con `ScheduleExpression: 'rate(5 minutes)'` cuyo target es `ReconcileFunction`, y el rol del scheduler solo puede invocar esa función.
-
-### CL-08 · Observabilidad y costos — `feat/cl-08-monitoring`
-
-§3.5. **Tests:** número de alarmas y sus métricas; budget con 3 notificaciones.
+`ScheduledReconciler`. **Tests:** existe `AWS::Scheduler::Schedule` con `ScheduleExpression: 'rate(5 minutes)'` cuyo target es `ReconcileFunction`, y el rol del scheduler solo puede invocar esa función.
 
 ### CL-09 · Verificación de seguridad y documentación — `feat/cl-09-security-verification`
 
@@ -299,7 +285,7 @@ Tras la evaluación: `npx cdk destroy --all -c stage=prod` y borrar a mano el sn
 | La API es alcanzable sin pasar por CloudFront | Secreto `X-Origin-Verify` generado + guard en Nest (C-06) |
 | CloudFront devuelve `index.html` en errores de la API | CloudFront Function solo en el behavior por defecto (no `customErrorResponses`) |
 | Se filtra el nombre de la compañía o una llave | Guards de CI + `.gitignore` de `.env*` y `*.pdf` |
-| Costos inesperados | Budget con alertas, NAT instance en vez de NAT Gateway, sin RDS Proxy ni WAF por defecto |
+| Costos inesperados | Free tier: NAT instance en vez de NAT Gateway, sin RDS Proxy ni WAF; `cdk destroy` documentado para después de la evaluación |
 
 ## 9. Definition of Done (todas las features)
 
