@@ -33,6 +33,10 @@ export class InMemoryTransactionRepository implements TransactionRepository {
     return Promise.resolve(this.byId.get(id) ?? null);
   }
 
+  findByReference(reference: string): Promise<Transaction | null> {
+    return Promise.resolve(this.all.find((stored) => stored.reference === reference) ?? null);
+  }
+
   findByIdempotencyKey(idempotencyKey: string): Promise<Transaction | null> {
     return Promise.resolve(
       this.all.find((stored) => stored.idempotencyKey === idempotencyKey) ?? null,
