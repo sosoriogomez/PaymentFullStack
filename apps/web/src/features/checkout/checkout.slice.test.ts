@@ -1,5 +1,7 @@
 import { ACCEPTANCE, someAmounts } from '@test/builders';
-import { checkoutReset, fetchAcceptance } from './checkout.actions';
+import { aTransaction } from '@test/builders';
+import { transactionUpdated } from '@/features/transaction/transaction.slice';
+import { checkoutReset, fetchAcceptance, retryWithAnotherCard } from './checkout.actions';
 import {
   checkoutSlice,
   checkoutStarted,
@@ -126,6 +128,42 @@ describe('checkout reducer', () => {
       expect(loading.acceptanceStatus).toBe('loading');
       expect(loaded).toMatchObject({ acceptance: ACCEPTANCE, acceptanceStatus: 'succeeded' });
       expect(failed.acceptanceStatus).toBe('failed');
+    });
+  });
+
+  describe('after the payment', () => {
+    const processing = { ...initialCheckoutState, step: 'PROCESSING' as const };
+
+    it('should show the result once the transaction is final, not before', () => {
+      expect(reduce(processing, transactionUpdated(aTransaction())).step).toBe('PROCESSING');
+      expect(
+        reduce(processing, transactionUpdated(aTransaction({ status: 'APPROVED' }))).step,
+      ).toBe('RESULT');
+      expect(
+        reduce(initialCheckoutState, transactionUpdated(aTransaction({ status: 'APPROVED' }))).step,
+      ).toBe('PRODUCT');
+    });
+
+    it('should start a new attempt with the same product and drafts but no key or card', () => {
+      const used = {
+        ...processing,
+        contact: { fullName: 'Ana Pérez', email: 'ana@mail.com', phone: '3001234567' },
+        idempotencyKey: 'k1',
+        card: { brand: 'VISA', lastFour: '4242', holderName: 'Ana Pérez' },
+        installments: 6,
+      };
+
+      const retry = reduce(used, retryWithAnotherCard({ productId: 'p1', quantity: 2 }));
+
+      expect(retry).toMatchObject({
+        step: 'PAYMENT_FORM',
+        productId: 'p1',
+        quantity: 2,
+        contact: used.contact,
+        installments: 6,
+        idempotencyKey: null,
+        card: null,
+      });
     });
   });
 });
