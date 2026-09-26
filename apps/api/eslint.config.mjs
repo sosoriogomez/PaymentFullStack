@@ -23,7 +23,10 @@ export default tseslint.config(
         'error',
         { prefer: 'type-imports', fixStyle: 'inline-type-imports', disallowTypeAnnotations: false },
       ],
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
       'max-lines-per-function': ['warn', { max: 30, skipBlankLines: true, skipComments: true }],
       complexity: ['warn', 8],
       'no-console': 'error',
