@@ -12,6 +12,11 @@
     color: var(--color-text);
   }
 
+  /* Progressive enhancement: without :has() the label simply keeps its color. */
+  .field:has(.input:focus-visible) .label {
+    color: var(--color-focus);
+  }
+
   .control {
     position: relative;
     display: flex;
