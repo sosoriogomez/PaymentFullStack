@@ -49,6 +49,11 @@ export class TypeOrmTransactionRepository implements TransactionRepository {
     return row ? toTransaction(row) : null;
   }
 
+  async findByReference(reference: string): Promise<Transaction | null> {
+    const row = await this.repository().findOneBy({ reference });
+    return row ? toTransaction(row) : null;
+  }
+
   private repository(tx?: TransactionContext) {
     return managerFor(this.dataSource, tx).getRepository(TransactionOrmEntity);
   }

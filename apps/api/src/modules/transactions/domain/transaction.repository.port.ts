@@ -17,6 +17,7 @@ export interface TransactionRepository {
   updateIfPending(transaction: Transaction, tx?: TransactionContext): Promise<boolean>;
   findById(id: string, tx?: TransactionContext): Promise<Transaction | null>;
   findByIdempotencyKey(idempotencyKey: string): Promise<Transaction | null>;
+  findByReference(reference: string): Promise<Transaction | null>;
 }
 
 export const TRANSACTION_REPOSITORY = Symbol('TransactionRepository');
