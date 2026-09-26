@@ -28,7 +28,8 @@ describe('CheckoutFlow', () => {
   it('should download the payment form on demand and open it', async () => {
     renderCatalog({ step: 'PAYMENT_FORM' });
 
-    const cardNumber = await screen.findByLabelText(es.checkout.card.number);
+    // The first import compiles the whole form module graph under Jest: it can take a while.
+    const cardNumber = await screen.findByLabelText(es.checkout.card.number, {}, { timeout: 5000 });
 
     expect(screen.getByRole('dialog', { name: es.checkout.modalTitle })).toContainElement(
       cardNumber,
