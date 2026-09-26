@@ -20,6 +20,13 @@ export class InMemoryProductRepository implements ProductRepository {
     return Promise.resolve(this.products.get(id) ?? null);
   }
 
+  decrementStockIfAvailable(productId: string, quantity: number): Promise<boolean> {
+    const product = this.products.get(productId);
+    if (!product?.hasStock(quantity)) return Promise.resolve(false);
+    this.products.set(productId, product.withStock(product.stock - quantity));
+    return Promise.resolve(true);
+  }
+
   save(product: Product): void {
     this.products.set(product.id, product);
   }

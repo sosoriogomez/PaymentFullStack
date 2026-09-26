@@ -12,6 +12,16 @@ export const TRANSACTION_CURRENCY = 'COP';
 /** Length of the `status_message` column. */
 export const MAX_STATUS_MESSAGE_LENGTH = 255;
 
+/** Status message of a transaction the gateway charged with other data than ours (I-06). */
+export const AMOUNT_MISMATCH = 'AMOUNT_MISMATCH';
+
+/** What the gateway reports about a charge. */
+export interface ChargeRecord {
+  readonly reference: string;
+  readonly amountInCents: number;
+  readonly currency: string;
+}
+
 export interface CardSummary {
   readonly brand: string;
   readonly lastFour: string;
@@ -170,6 +180,16 @@ export class Transaction {
 
   get isFinal(): boolean {
     return isFinalStatus(this.props.status);
+  }
+
+  /** Invariant I-06: the gateway charged exactly this transaction (reference, amount, currency). */
+  matchesCharge(record: ChargeRecord): boolean {
+    const { total } = this.props.amounts;
+    return (
+      record.reference === this.props.reference &&
+      record.amountInCents === total.amountInCents &&
+      record.currency === total.currency
+    );
   }
 
   /** Same Idempotency-Key and same purchase intent (ADR-006). */

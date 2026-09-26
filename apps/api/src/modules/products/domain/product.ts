@@ -56,6 +56,11 @@ export class Product {
     return this.props.updatedAt;
   }
 
+  /** New instance with another stock count (e.g. after a purchase). */
+  withStock(stock: number): Product {
+    return new Product({ ...this.props, stock });
+  }
+
   hasStock(quantity: number): boolean {
     return this.props.stock >= quantity;
   }

@@ -1,3 +1,4 @@
+import { type DeliveryRepository } from '../../deliveries/domain/delivery.repository.port';
 import { type ProductRepository } from '../../products/domain/product.repository.port';
 import { type Transaction } from '../domain/transaction';
 
@@ -9,7 +10,10 @@ export interface TransactionView {
 }
 
 export class TransactionViews {
-  constructor(private readonly products: ProductRepository) {}
+  constructor(
+    private readonly products: ProductRepository,
+    private readonly deliveries: DeliveryRepository,
+  ) {}
 
   async of(transaction: Transaction): Promise<TransactionView> {
     const product = await this.products.findById(transaction.productId);
@@ -19,8 +23,14 @@ export class TransactionViews {
     return {
       transaction,
       product: { id: product.id, name: product.name },
-      // Deliveries exist only for APPROVED transactions (finalization, BE-08).
-      deliveryId: null,
+      deliveryId: await this.deliveryIdOf(transaction),
     };
+  }
+
+  /** Only APPROVED transactions get a delivery (finalization). */
+  private deliveryIdOf(transaction: Transaction): Promise<string | null> {
+    return transaction.status === 'APPROVED'
+      ? this.deliveries.findIdByTransactionId(transaction.id)
+      : Promise.resolve(null);
   }
 }

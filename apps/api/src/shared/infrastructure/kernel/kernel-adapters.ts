@@ -1,5 +1,12 @@
+import { Logger } from '@nestjs/common';
 import { createHash, randomUUID } from 'node:crypto';
-import { type Clock, type Hasher, type IdGenerator } from '../../kernel/ports';
+import {
+  type AlertContext,
+  type AlertLog,
+  type Clock,
+  type Hasher,
+  type IdGenerator,
+} from '../../kernel/ports';
 
 export class SystemClock implements Clock {
   now(): Date {
@@ -17,5 +24,18 @@ export class CryptoIdGenerator implements IdGenerator {
 export class Sha256Hasher implements Hasher {
   sha256(value: string): string {
     return createHash('sha256').update(value, 'utf8').digest('hex');
+  }
+}
+
+/** Alerts go to the application log with a stable `alert` field, ready for a metric filter. */
+export class LoggerAlertLog implements AlertLog {
+  private readonly logger = new Logger('Alerts');
+
+  warn(event: string, context: AlertContext): void {
+    this.logger.warn(JSON.stringify({ alert: event, ...context }));
+  }
+
+  error(event: string, context: AlertContext): void {
+    this.logger.error(JSON.stringify({ alert: event, ...context }));
   }
 }
