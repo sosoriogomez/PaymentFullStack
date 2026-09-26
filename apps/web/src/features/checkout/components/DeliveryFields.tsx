@@ -56,7 +56,7 @@ export function DeliveryFields() {
         {...register('addressLine2')}
         error={errors.addressLine2?.message}
       />
-      <div className={styles.row}>
+      <div className={`${styles.row} ${styles.wideRow}`}>
         <Select
           label={texts.region}
           placeholder={texts.regionPlaceholder}
