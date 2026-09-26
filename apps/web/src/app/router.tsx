@@ -1,7 +1,7 @@
 import { createBrowserRouter, type RouteObject } from 'react-router';
 import { ProductPage } from '@/features/catalog/pages/ProductPage';
-import { TransactionStatusPage } from '@/features/transaction/pages/TransactionStatusPage';
 import { AppLayout } from './App';
+import { TransactionStatusPage } from './lazy-pages';
 import { NotFoundPage } from './NotFoundPage';
 
 export const routes: RouteObject[] = [

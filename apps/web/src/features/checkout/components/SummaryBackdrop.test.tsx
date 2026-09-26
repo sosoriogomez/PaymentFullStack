@@ -132,6 +132,7 @@ describe('SummaryBackdrop', () => {
     );
     const { user, router } = renderRoute('/', { preloadedState: summaryState(), services });
 
+    await screen.findByRole('dialog', { name: texts.title });
     await user.click(payButton());
 
     await waitFor(() => {
