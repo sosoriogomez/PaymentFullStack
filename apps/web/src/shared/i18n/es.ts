@@ -97,7 +97,8 @@ export const es = {
     title: 'Resumen de tu compra',
     edit: 'Editar',
     breakdown: 'Detalle del pago',
-    product: (name: string, quantity: number) => `${name} × ${quantity}`,
+    // Non-breaking spaces: "× 1" never wraps away from the product name.
+    product: (name: string, quantity: number) => `${name}\u00a0×\u00a0${quantity}`,
     baseFee: 'Tarifa base',
     deliveryFee: 'Envío',
     total: 'Total',
