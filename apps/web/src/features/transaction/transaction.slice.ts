@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { type Delivery, type Transaction } from '@/shared/api/contracts';
-import { checkoutReset } from '@/features/checkout/checkout.actions';
+import { checkoutReset, payOrder } from '@/features/checkout/checkout.actions';
 
 export type PollingState = 'idle' | 'active' | 'timeout';
 
@@ -37,7 +37,12 @@ export const transactionSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(checkoutReset, () => initialTransactionState);
+    builder
+      .addCase(checkoutReset, () => initialTransactionState)
+      .addCase(payOrder.fulfilled, (_state, action) => ({
+        ...initialTransactionState,
+        current: action.payload,
+      }));
   },
 });
 
