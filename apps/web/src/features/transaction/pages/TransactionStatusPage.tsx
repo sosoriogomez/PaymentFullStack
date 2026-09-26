@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { retryWithAnotherCard } from '@/features/checkout/checkout.actions';
@@ -24,8 +24,12 @@ export function TransactionStatusPage() {
   const pending = transaction?.status === 'PENDING';
   const deliveryId = transaction?.status === 'APPROVED' ? transaction.deliveryId : null;
 
-  // Deep link without saved state (I-10): load it by id.
+  // Deep link without saved state (I-10): load it by id, once. Leaving the page resets the
+  // checkout while it is still mounted, and that must not bring the transaction back.
+  const requestedId = useRef<string | null>(null);
   useEffect(() => {
+    if (requestedId.current === transactionId) return;
+    requestedId.current = transactionId;
     if (!transaction) void dispatch(fetchTransaction(transactionId));
   }, [dispatch, transaction, transactionId]);
 
