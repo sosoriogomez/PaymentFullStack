@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { type NestExpressApplication } from '@nestjs/platform-express';
+import { Logger } from 'nestjs-pino';
 import { AppModule } from '../app.module';
 import { configureApp } from './configure-app';
 
@@ -12,5 +13,6 @@ export async function createApp(): Promise<NestExpressApplication> {
     bufferLogs: true,
     abortOnError: false,
   });
+  app.useLogger(app.get(Logger));
   return configureApp(app);
 }

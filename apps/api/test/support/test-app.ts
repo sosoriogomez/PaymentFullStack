@@ -1,3 +1,4 @@
+import { type Type } from '@nestjs/common';
 import { Test, type TestingModuleBuilder } from '@nestjs/testing';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from '../../src/app.module';
@@ -8,12 +9,17 @@ import { testEnv } from './test-env';
 
 export interface TestAppOptions {
   readonly env?: Record<string, string | undefined>;
+  /** Extra controllers, e.g. probes that exercise cross-cutting behavior. */
+  readonly controllers?: Type[];
   readonly customize?: (builder: TestingModuleBuilder) => TestingModuleBuilder;
 }
 
 /** Builds the real AppModule with test configuration; `customize` swaps ports for fakes. */
 export async function createTestApp(options: TestAppOptions = {}): Promise<NestExpressApplication> {
-  const builder = Test.createTestingModule({ imports: [AppModule] })
+  const builder = Test.createTestingModule({
+    imports: [AppModule],
+    controllers: options.controllers ?? [],
+  })
     .overrideProvider(AppConfigService)
     .useValue(new AppConfigService(parseEnv(testEnv(options.env))));
   const moduleRef = await (options.customize?.(builder) ?? builder).compile();
