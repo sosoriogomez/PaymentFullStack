@@ -16,9 +16,16 @@
   }
 
   .row {
+    --row-min: 8rem;
+
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--row-min)), 1fr));
     gap: var(--space-4);
+  }
+
+  /* Longer values ("San Andrés y Providencia"): side by side only when neither gets cut. */
+  .wideRow {
+    --row-min: 14rem;
   }
 }
 
