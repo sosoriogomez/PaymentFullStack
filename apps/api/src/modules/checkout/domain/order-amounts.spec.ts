@@ -1,6 +1,6 @@
 import { aProduct, cop } from '../../../../test/builders/product.builder';
 import { err, ok } from '../../../shared/kernel/result';
-import { FlatFeePolicy } from '../infrastructure/flat-fee.policy';
+import { FlatFeePolicy } from './flat-fee.policy';
 import { type FeePolicy } from './fee-policy.port';
 import { inCents, priceOrder } from './order-amounts';
 import { Quantity } from './quantity';

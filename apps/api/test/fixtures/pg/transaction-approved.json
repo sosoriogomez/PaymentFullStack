@@ -1,0 +1,30 @@
+{
+  "data": {
+    "id": "15113-1790866800-10001",
+    "created_at": "2026-10-01T15:00:00.000Z",
+    "amount_in_cents": 16300000,
+    "reference": "TX-01J9ZK3Q8Y2M4N6P7R8S9T0V1W",
+    "customer_email": "ana@mail.com",
+    "currency": "COP",
+    "payment_method_type": "CARD",
+    "payment_method": {
+      "type": "CARD",
+      "extra": {
+        "bin": "424242",
+        "name": "VISA-4242",
+        "brand": "VISA",
+        "exp_year": "29",
+        "exp_month": "08",
+        "last_four": "4242",
+        "card_holder": "ANA PEREZ"
+      },
+      "installments": 1
+    },
+    "status": "APPROVED",
+    "status_message": null,
+    "shipping_address": null,
+    "redirect_url": null,
+    "payment_link_id": null
+  },
+  "meta": {}
+}

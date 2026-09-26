@@ -1,0 +1,18 @@
+{
+  "data": {
+    "id": 999,
+    "name": "Checkout Sandbox Merchant",
+    "legal_name": "Checkout Sandbox Merchant S.A.S.",
+    "presigned_acceptance": {
+      "acceptance_token": "eyJhbGciOiJIUzI1NiJ9.acceptance.fixture",
+      "permalink": "https://gateway.test/terms/privacy-policy.pdf",
+      "type": "END_USER_POLICY"
+    },
+    "presigned_personal_data_auth": {
+      "acceptance_token": "eyJhbGciOiJIUzI1NiJ9.personal-data.fixture",
+      "permalink": "https://gateway.test/terms/personal-data.pdf",
+      "type": "PERSONAL_DATA_AUTH"
+    }
+  },
+  "meta": {}
+}

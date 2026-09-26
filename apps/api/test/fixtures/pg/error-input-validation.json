@@ -1,0 +1,10 @@
+{
+  "error": {
+    "type": "INPUT_VALIDATION_ERROR",
+    "messages": {
+      "payment_method": {
+        "token": ["El token ha expirado"]
+      }
+    }
+  }
+}
