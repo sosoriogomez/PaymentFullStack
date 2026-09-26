@@ -54,6 +54,8 @@ export default tseslint.config(
   },
   {
     files: ['src/features/**/*.{ts,tsx}'],
+    // Tests may build a real store to exercise thunks and listeners.
+    ignores: ['**/*.test.{ts,tsx}'],
     rules: {
       'no-restricted-imports': layerRule(
         'Una feature no depende de app/ (solo de hooks tipados).',

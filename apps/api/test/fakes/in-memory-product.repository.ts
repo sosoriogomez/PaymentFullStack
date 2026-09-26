@@ -9,7 +9,10 @@ export class InMemoryProductRepository implements ProductRepository {
   }
 
   findAll(limit: number): Promise<Product[]> {
-    const sorted = [...this.products.values()].sort((a, b) => a.sku.localeCompare(b.sku));
+    const soldOutLast = (product: Product) => (product.stock === 0 ? 1 : 0);
+    const sorted = [...this.products.values()].sort(
+      (a, b) => soldOutLast(a) - soldOutLast(b) || a.sku.localeCompare(b.sku),
+    );
     return Promise.resolve(sorted.slice(0, limit));
   }
 
