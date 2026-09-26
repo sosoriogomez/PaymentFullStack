@@ -1,0 +1,76 @@
+@layer components {
+  /* Patrón Backdrop de Material: capa trasera con contexto y capa frontal que sube desde abajo. */
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-backdrop);
+    display: grid;
+    grid-template-rows: auto 1fr;
+    color: var(--color-on-accent);
+    background: var(--color-accent);
+    animation: fade-in var(--duration-base) var(--ease-standard);
+  }
+
+  .backLayer {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--gutter) var(--space-6);
+    padding-top: max(var(--space-4), env(safe-area-inset-top));
+  }
+
+  .frontLayer {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    color: var(--color-text);
+    background: var(--color-surface);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    box-shadow: var(--shadow-3);
+    animation: rise var(--duration-slow) var(--ease-emphasized);
+  }
+
+  .subheader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--gutter) var(--space-2);
+  }
+
+  .title {
+    font-size: var(--text-lg);
+  }
+
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-2) var(--gutter) var(--space-4);
+  }
+
+  .footer {
+    padding: var(--space-3) var(--gutter);
+    padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+    border-top: var(--border-width) solid var(--color-border);
+  }
+
+  @media (min-width: 600px) {
+    .backLayer,
+    .frontLayer {
+      width: min(100%, 560px);
+      margin-inline: auto;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes rise {
+    from {
+      transform: translateY(100%);
+    }
+  }
+}
