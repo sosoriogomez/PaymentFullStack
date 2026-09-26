@@ -6,6 +6,13 @@ export const es = {
     brand: 'Tienda',
     sandboxNotice: 'Pagos procesados en modo sandbox: no se cobra dinero real.',
     skipToContent: 'Saltar al contenido',
+    loading: 'Cargando…',
+    notFound: { title: 'No encontramos esta página', back: 'Volver a la tienda' },
+    failure: {
+      title: 'Algo salió mal',
+      text: 'No pudimos mostrar esta página. Revisa tu conexión y vuelve a cargarla.',
+      reload: 'Volver a cargar',
+    },
   },
   catalog: {
     title: 'Productos',
@@ -21,6 +28,7 @@ export const es = {
   checkout: {
     modalTitle: 'Pago con tarjeta',
     recovering: 'Estamos verificando el estado de tu pago…',
+    opening: 'Preparando el formulario de pago…',
     continue: 'Continuar',
     close: 'Cerrar',
     delivery: {
