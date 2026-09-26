@@ -2,8 +2,10 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { type UiError } from '@/shared/lib/ui-error';
 import {
   CARD_REENTRY_REQUIRED,
+  checkoutRecovered,
   checkoutReset,
   fetchAcceptance,
+  paymentRecoveryFailed,
   payOrder,
   retryWithAnotherCard,
 } from './checkout.actions';
@@ -57,6 +59,13 @@ export const checkoutSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(checkoutReset, () => initialCheckoutState)
+      .addCase(checkoutRecovered, (state) => {
+        // SUMMARY needs the card token, which is never persisted: back to the form, same key.
+        if (state.step === 'SUMMARY') Object.assign(state, reentryState);
+      })
+      .addCase(paymentRecoveryFailed, (state) => {
+        Object.assign(state, reentryState);
+      })
       .addCase(retryWithAnotherCard, (state, action) => ({
         ...initialCheckoutState,
         contact: state.contact,

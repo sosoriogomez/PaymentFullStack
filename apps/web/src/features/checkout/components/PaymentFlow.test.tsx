@@ -162,6 +162,15 @@ describe('PaymentFlow', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('should show that the payment is being verified while a refresh recovers it', () => {
+    renderFlow({ step: 'PROCESSING' });
+
+    expect(screen.getByRole('dialog', { name: es.checkout.modalTitle })).toHaveTextContent(
+      es.checkout.recovering,
+    );
+    expect(screen.queryByRole('button', { name: es.checkout.close })).not.toBeInTheDocument();
+  });
+
   it('should render nothing outside the payment steps', () => {
     renderFlow({ step: 'PRODUCT' });
 
