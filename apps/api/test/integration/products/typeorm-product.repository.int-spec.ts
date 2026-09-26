@@ -24,13 +24,17 @@ describe('TypeOrmProductRepository', () => {
     await database.drop();
   });
 
-  it('should list products ordered by sku with a limit', async () => {
+  it('should list available products first, then sold out ones, by sku, with a limit', async () => {
     const all = await repository.findAll(50);
     const firstTwo = await repository.findAll(2);
+    const bySku = (a: { sku: string }, b: { sku: string }) => a.sku.localeCompare(b.sku);
+    const expected = [
+      ...PRODUCT_SEEDS.filter((seed) => seed.stock > 0).sort(bySku),
+      ...PRODUCT_SEEDS.filter((seed) => seed.stock === 0).sort(bySku),
+    ].map((seed) => seed.sku);
 
-    expect(all.map((product) => product.sku)).toEqual(
-      [...PRODUCT_SEEDS].map((seed) => seed.sku).sort(),
-    );
+    expect(all.map((product) => product.sku)).toEqual(expected);
+    expect(all.at(-1)?.stock).toBe(0);
     expect(firstTwo).toHaveLength(2);
   });
 

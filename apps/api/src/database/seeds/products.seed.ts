@@ -23,7 +23,7 @@ export const PRODUCT_SEEDS: readonly ProductSeed[] = [
   {
     id: '6f1d8a4e-3c2b-4a1e-9b7d-0a1b2c3d4e02',
     sku: 'KBD-002',
-    name: 'Teclado mecánico Nova 75 %',
+    name: 'Teclado mecánico Nova 75\u00a0%',
     description:
       'Teclado compacto con switches lineales intercambiables en caliente, retroiluminación RGB y conexión Bluetooth o cable.',
     priceInCents: 329_900_00,
