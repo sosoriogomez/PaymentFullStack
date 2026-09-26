@@ -127,7 +127,7 @@ npm run lint && npm run typecheck
 | SPA ([detalle](apps/web/README.md#pruebas-y-cobertura)) | 326 | 97.37 % | 94.40 % | 98.37 % | 99.70 % |
 | Infraestructura ([detalle](infra/README.md#pruebas)) | 52 | 100 % | 90.47 % | 100 % | 100 % |
 
-El CI ([`ci.yml`](.github/workflows/ci.yml)) corre en cada PR y en cada push a `main`:
+El CI ([`ci.yml`](.github/workflows/ci.yml)) corre en cada PR, en cada push a `main` y a mano desde la pestaña *Actions*:
 
 - lint, typecheck y `dependency-cruiser` (verifica las capas de la arquitectura hexagonal);
 - los tests con un umbral de cobertura del 85 %;

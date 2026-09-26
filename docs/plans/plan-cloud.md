@@ -234,7 +234,7 @@ template.hasResourceProperties('AWS::ApiGatewayV2::Stage', {
 
 ### CL-07 · CD — `feat/cl-07-deploy`
 
-`deploy.yml` y scripts de §4.2; GitHub Variables `AWS_DEPLOY_ROLE_ARN`, `PG_HOST`, `PG_BASE_URL`, `PG_PUBLIC_KEY`. **Aceptación:** push a `main` despliega de punta a punta y el smoke test pasa; un fallo de migración detiene el job antes de publicar el front.
+`deploy.yml` y scripts de §4.2; GitHub Variables `AWS_DEPLOY_ROLE_ARN`, `PG_HOST`, `PG_BASE_URL`, `PG_PUBLIC_KEY`. **Aceptación:** push a `main` despliega de punta a punta y el smoke test pasa; un fallo de migración detiene el job antes de publicar el front; sin `AWS_DEPLOY_ROLE_ARN` el job se omite (no falla).
 
 > **Walking skeleton (fase 4):** CL-01…CL-05 + CL-07 con BE-03/FE-04 listos, para tener la URL pública mostrando el catálogo lo antes posible.
 
