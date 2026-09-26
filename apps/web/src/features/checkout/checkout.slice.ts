@@ -14,6 +14,7 @@ export type CheckoutStep = (typeof CHECKOUT_STEPS)[number];
 
 export const MAX_QUANTITY = 10;
 export const DEFAULT_INSTALLMENTS = 1;
+export const MAX_INSTALLMENTS = 36;
 
 export interface ContactDraft {
   readonly fullName: string;
