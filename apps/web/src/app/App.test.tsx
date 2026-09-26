@@ -1,18 +1,27 @@
-import { render, screen } from '@testing-library/react';
-import { App } from './App';
+import { screen } from '@testing-library/react';
+import { renderRoute } from '@test/support/render-route';
+import { es } from '@/shared/i18n/es';
 
-describe('App', () => {
-  it('should render the store shell with its main landmark', () => {
-    render(<App />);
+describe('AppLayout', () => {
+  it('should render the store shell with its landmarks and a skip link', async () => {
+    renderRoute('/');
 
     expect(screen.getByRole('banner')).toBeInTheDocument();
-    expect(screen.getByRole('main')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 1, name: 'Productos' })).toBeInTheDocument();
+    expect(screen.getByRole('main')).toHaveAttribute('id', 'main-content');
+    expect(screen.getByRole('link', { name: es.app.skipToContent })).toHaveAttribute(
+      'href',
+      '#main-content',
+    );
+    expect(screen.getByRole('contentinfo')).toHaveTextContent(/sandbox/i);
+    expect(
+      await screen.findByRole('heading', { level: 1, name: es.catalog.title }),
+    ).toBeInTheDocument();
   });
 
-  it('should warn that payments run in sandbox mode', () => {
-    render(<App />);
+  it('should show a not found page for unknown routes', () => {
+    renderRoute('/does-not-exist');
 
-    expect(screen.getByRole('contentinfo')).toHaveTextContent(/sandbox/i);
+    expect(screen.getByRole('heading', { name: 'No encontramos esta página' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Volver a la tienda' })).toHaveAttribute('href', '/');
   });
 });
