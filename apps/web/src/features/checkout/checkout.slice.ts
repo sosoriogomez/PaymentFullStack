@@ -1,7 +1,8 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { type Acceptance, type OrderAmounts } from '@/shared/api/contracts';
+import { type LoadStatus } from '@/shared/lib/load-status';
 import { type UiError } from '@/shared/lib/ui-error';
-import { checkoutReset } from './checkout.actions';
+import { checkoutReset, fetchAcceptance } from './checkout.actions';
 
 export const CHECKOUT_STEPS = [
   'PRODUCT',
@@ -53,6 +54,7 @@ export interface CheckoutState {
   readonly installments: number;
   /** Tokens are short lived and must be accepted explicitly every time: never persisted. */
   readonly acceptance: Acceptance | null;
+  readonly acceptanceStatus: LoadStatus;
   readonly quote: OrderAmounts | null;
   /** One per purchase attempt; survives refreshes and card re-entry (C-04, ADR-006). */
   readonly idempotencyKey: string | null;
@@ -81,11 +83,25 @@ export const initialCheckoutState: CheckoutState = {
   cardTokenExpiresAt: null,
   installments: DEFAULT_INSTALLMENTS,
   acceptance: null,
+  acceptanceStatus: 'idle',
   quote: null,
   idempotencyKey: null,
   cardReentryRequired: false,
   submission: { status: 'idle', error: null },
 };
+
+/** Everything the payment form produced, except card data: only its metadata and the token. */
+export interface AcceptedPaymentForm {
+  readonly card: CardSummary;
+  readonly cardToken: string;
+  readonly cardTokenExpiresAt: number;
+  readonly customerId: string;
+  readonly quote: OrderAmounts;
+  readonly installments: number;
+  readonly contact: ContactDraft;
+  readonly delivery: DeliveryDraft;
+  readonly idempotencyKey: string;
+}
 
 export const checkoutSlice = createSlice({
   name: 'checkout',
@@ -110,9 +126,32 @@ export const checkoutSlice = createSlice({
     summaryEditRequested(state) {
       state.step = 'PAYMENT_FORM';
     },
+    paymentFormSubmitted(state) {
+      state.submission = { status: 'pending', error: null };
+    },
+    paymentFormAccepted(state, action: PayloadAction<AcceptedPaymentForm>) {
+      Object.assign(state, action.payload);
+      state.step = 'SUMMARY';
+      state.cardReentryRequired = false;
+      state.submission = { status: 'idle', error: null };
+    },
+    paymentFormFailed(state, action: PayloadAction<UiError>) {
+      state.submission = { status: 'failed', error: action.payload };
+    },
   },
   extraReducers: (builder) => {
-    builder.addCase(checkoutReset, () => initialCheckoutState);
+    builder
+      .addCase(checkoutReset, () => initialCheckoutState)
+      .addCase(fetchAcceptance.pending, (state) => {
+        state.acceptanceStatus = 'loading';
+      })
+      .addCase(fetchAcceptance.fulfilled, (state, action) => {
+        state.acceptance = action.payload;
+        state.acceptanceStatus = 'succeeded';
+      })
+      .addCase(fetchAcceptance.rejected, (state) => {
+        state.acceptanceStatus = 'failed';
+      });
   },
 });
 
@@ -122,4 +161,7 @@ export const {
   contactDraftUpdated,
   deliveryDraftUpdated,
   summaryEditRequested,
+  paymentFormSubmitted,
+  paymentFormAccepted,
+  paymentFormFailed,
 } = checkoutSlice.actions;
