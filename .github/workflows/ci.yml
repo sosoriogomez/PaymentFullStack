@@ -62,7 +62,7 @@ jobs:
         if: always()
         run: node .github/scripts/coverage-summary.mjs apps/api/coverage/coverage-summary.json "API" >> "$GITHUB_STEP_SUMMARY"
       - run: npm run build -w apps/api
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: api-coverage
@@ -91,7 +91,7 @@ jobs:
         if: always()
         run: node .github/scripts/coverage-summary.mjs apps/web/coverage/coverage-summary.json "Web" >> "$GITHUB_STEP_SUMMARY"
       - run: npm run build -w apps/web
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: web-coverage
