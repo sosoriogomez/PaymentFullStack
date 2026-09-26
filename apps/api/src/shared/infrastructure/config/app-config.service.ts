@@ -11,6 +11,8 @@ export interface AppSettings {
 export interface HttpSettings {
   readonly corsAllowedOrigins: readonly string[];
   readonly originVerifySecret: string | undefined;
+  /** Per client IP and route, best-effort (in memory per Lambda instance, I-01). */
+  readonly rateLimit: { readonly perMinute: number; readonly paymentsPerMinute: number };
 }
 
 export interface DatabaseSettings {
@@ -60,6 +62,10 @@ const appSettings = (env: Env): AppSettings => ({
 const httpSettings = (env: Env): HttpSettings => ({
   corsAllowedOrigins: env.CORS_ALLOWED_ORIGINS,
   originVerifySecret: env.ORIGIN_VERIFY_SECRET,
+  rateLimit: {
+    perMinute: env.RATE_LIMIT_PER_MINUTE,
+    paymentsPerMinute: env.PAYMENT_RATE_LIMIT_PER_MINUTE,
+  },
 });
 
 const databaseSettings = (env: Env): DatabaseSettings => ({

@@ -47,6 +47,7 @@ Severidad:
 | I-18 | FE §2.2, FE-06, FE-07 | El token de tarjeta expira: se guarda `cardTokenExpiresAt`; si venció al pagar, se pide re-captura |
 | I-19 | BE §6.3, BE-06 | Formato de teléfonos: `shipping_address.phone_number` nacional (10 dígitos) y `customer_data.phone_number` con indicativo `57`; se confirma en el spike de BE-06 |
 | I-20 | FE-02 | No se pudo verificar que la sandbox permita CORS en `/tokens/cards` desde el navegador. Se agrega un **spike** al inicio de FE-02 y un plan B (proxy en el backend que no persiste ni loguea) que no cambia el puerto `CardTokenizer` |
+| I-21 | CL-05, BE-11 | Detectado al implementar: la política administrada `AllViewerExceptHostHeader` no reenvía encabezados de CloudFront, así que `CloudFront-Viewer-Address` no llegaba a la API y el límite por IP habría contado por *edge location*. Se reemplaza por una política propia con allowlist (encabezados que la API lee + `CloudFront-Viewer-Address`, sin `Host`) |
 
 ## Menores
 

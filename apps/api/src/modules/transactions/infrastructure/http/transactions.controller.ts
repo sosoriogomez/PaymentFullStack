@@ -4,6 +4,7 @@ import {
   IDEMPOTENT_REPLAYED_HEADER,
   IdempotencyKey,
 } from '../../../../shared/infrastructure/http/idempotency-key';
+import { PaymentRateLimit } from '../../../../shared/infrastructure/http/security/rate-limit';
 import { unwrapOrThrow } from '../../../../shared/infrastructure/http/unwrap';
 import { uuidParam } from '../../../../shared/infrastructure/http/uuid-param';
 import { CreateTransaction } from '../../application/create-transaction.use-case';
@@ -29,6 +30,7 @@ export class TransactionsController {
    * `Idempotent-Replayed` when the key was already used for the same purchase (I-05).
    */
   @Post()
+  @PaymentRateLimit()
   async create(
     @IdempotencyKey() idempotencyKey: string,
     @Body() body: CreateTransactionRequest,
