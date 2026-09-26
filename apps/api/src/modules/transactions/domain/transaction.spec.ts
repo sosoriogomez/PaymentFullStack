@@ -167,6 +167,16 @@ describe('Transaction', () => {
     });
   });
 
+  it('should match only a charge with its reference, total and currency (I-06)', () => {
+    const transaction = aTransaction().build();
+    const charge = { reference: transaction.reference, amountInCents: 163_000_00, currency: 'COP' };
+
+    expect(transaction.matchesCharge(charge)).toBe(true);
+    expect(transaction.matchesCharge({ ...charge, reference: 'TX-OTHER' })).toBe(false);
+    expect(transaction.matchesCharge({ ...charge, amountInCents: 163_000_01 })).toBe(false);
+    expect(transaction.matchesCharge({ ...charge, currency: 'USD' })).toBe(false);
+  });
+
   it('should recognize the same request by its hash', () => {
     const transaction = aTransaction()
       .with({ requestHash: 'b'.repeat(64) })
