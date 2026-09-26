@@ -2,6 +2,7 @@ import { type DataSource } from 'typeorm';
 import { createDataSource } from '../../../src/database/data-source-options';
 import { PRODUCT_SEEDS, seedProducts } from '../../../src/database/seeds/products.seed';
 import { FlatFeePolicy } from '../../../src/modules/checkout/domain/flat-fee.policy';
+import { TypeOrmDeliveryRepository } from '../../../src/modules/deliveries/infrastructure/persistence/typeorm-delivery.repository';
 import { TypeOrmCustomerRepository } from '../../../src/modules/customers/infrastructure/persistence/typeorm-customer.repository';
 import { TypeOrmProductRepository } from '../../../src/modules/products/infrastructure/persistence/typeorm-product.repository';
 import {
@@ -174,7 +175,7 @@ describe('TypeOrmTransactionRepository', () => {
         ids: new CryptoIdGenerator(),
         clock: new FixedClock(),
         hasher,
-        views: new TransactionViews(products),
+        views: new TransactionViews(products, new TypeOrmDeliveryRepository(dataSource)),
       });
     };
     const command = (idempotencyKey: string): CreateTransactionCommand => ({

@@ -2,6 +2,7 @@ import { aCustomer, CUSTOMER_ID } from '../../../../test/builders/customer.build
 import { aProduct, PRODUCT_ID } from '../../../../test/builders/product.builder';
 import { DELIVERY, IDEMPOTENCY_KEY, PAYMENT } from '../../../../test/builders/transaction.builder';
 import { FAKE_CARD, FakePaymentGateway } from '../../../../test/fakes/fake-payment-gateway';
+import { InMemoryDeliveryRepository } from '../../../../test/fakes/in-memory-delivery.repository';
 import { InMemoryCustomerRepository } from '../../../../test/fakes/in-memory-customer.repository';
 import { InMemoryProductRepository } from '../../../../test/fakes/in-memory-product.repository';
 import { InMemoryTransactionRepository } from '../../../../test/fakes/in-memory-transaction.repository';
@@ -51,7 +52,7 @@ const setup = ({ stock = 5 }: { stock?: number } = {}) => {
     ids: new SequentialIdGenerator(),
     clock: new FixedClock(),
     hasher,
-    views: new TransactionViews(products),
+    views: new TransactionViews(products, new InMemoryDeliveryRepository()),
   });
   return { useCase, transactions, products, gateway };
 };

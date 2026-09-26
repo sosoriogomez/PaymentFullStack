@@ -1,5 +1,6 @@
 import { aProduct } from '../../../../test/builders/product.builder';
 import { aTransaction, IDEMPOTENCY_KEY } from '../../../../test/builders/transaction.builder';
+import { InMemoryDeliveryRepository } from '../../../../test/fakes/in-memory-delivery.repository';
 import { InMemoryProductRepository } from '../../../../test/fakes/in-memory-product.repository';
 import { InMemoryTransactionRepository } from '../../../../test/fakes/in-memory-transaction.repository';
 import { FindTransactionByIdempotencyKey } from './find-transaction-by-idempotency-key.use-case';
@@ -7,7 +8,7 @@ import { TransactionViews } from './transaction-views';
 
 describe('FindTransactionByIdempotencyKey', () => {
   const products = new InMemoryProductRepository([aProduct().build()]);
-  const views = new TransactionViews(products);
+  const views = new TransactionViews(products, new InMemoryDeliveryRepository());
 
   it('should return the transaction created with the key', async () => {
     const transaction = aTransaction().build();
@@ -37,7 +38,10 @@ describe('FindTransactionByIdempotencyKey', () => {
 
 describe('TransactionViews', () => {
   it('should fail loudly when the product of a transaction is missing', async () => {
-    const views = new TransactionViews(new InMemoryProductRepository());
+    const views = new TransactionViews(
+      new InMemoryProductRepository(),
+      new InMemoryDeliveryRepository(),
+    );
 
     await expect(views.of(aTransaction().build())).rejects.toThrow('is missing');
   });
