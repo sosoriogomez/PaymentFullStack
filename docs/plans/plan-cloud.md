@@ -74,7 +74,7 @@ export const STAGES = {
 | Construct | Responsabilidad |
 |---|---|
 | `ApiLambda` | `lambda.Function` Node 24 arm64 en VPC, logs con retención, `NODE_OPTIONS=--enable-source-maps`, reserved concurrency opcional, permisos mínimos. Recibe `code: lambda.Code` por props (inyección: `Code.fromAsset(dist-lambda)` en la app, `Code.fromInline` en tests) |
-| `ScheduledReconciler` | `ReconcileFunction` + `scheduler.Schedule` `rate(5 minutes)` con target `LambdaInvoke`, reintentos 2 |
+| Schedule de reconciliación (en `ApiStack`) | `ReconcileFunction` + `scheduler.Schedule` `rate(5 minutes)` con target `LambdaInvoke`, sin reintentos y edad máxima de 4 min |
 | `SecurityHeadersPolicy` | Tres `ResponseHeadersPolicy`: web, API y docs (Swagger) |
 | `SpaRewriteFunction` | `cloudfront.Function` (runtime `cloudfront-js-2.0`) desde `functions/spa-rewrite.js` |
 
@@ -123,7 +123,7 @@ function handler(event) {
 - Entorno no secreto: fees, timeouts, `APP_ENV=aws`, nombres de parámetros SSM y ARNs de secretos (los valores se leen en el *cold start*).
 - Permisos: `ssm:GetParameters` sobre `parameter/checkout/prod/*`, `kms:Decrypt` de `aws/ssm`, `dbSecret.grantRead(fn)` y `originSecret.grantRead(apiFunction)`.
 - `HttpApi` con integración `HttpLambdaIntegration` (payload v2), ruta `ANY /{proxy+}`, stage `$default` con throttling (25 rps / burst 50) y access logs JSON.
-- `ScheduledReconciler` (C-03).
+- Schedule de reconciliación de EventBridge Scheduler (C-03).
 
 ### 3.4 Web y edge (`WebStack`)
 
@@ -221,7 +221,7 @@ Se adelanta a la fase 1 (spec overview) para que todo PR posterior pase por los 
 
 ### CL-04 · API — `feat/cl-04-api`
 
-§3.3 (sin `ScheduledReconciler`, que se añade cuando existe BE-14). **Tests:**
+§3.3 (sin el schedule de reconciliación, que se añade cuando existe BE-14). **Tests:**
 ```ts
 const template = Template.fromStack(apiStack);
 template.hasResourceProperties('AWS::Lambda::Function', {
@@ -246,7 +246,7 @@ template.hasResourceProperties('AWS::ApiGatewayV2::Stage', {
 
 ### CL-04b · Reconciliación programada — dentro de `feat/be-14-reconciliation`
 
-`ScheduledReconciler`. **Tests:** existe `AWS::Scheduler::Schedule` con `ScheduleExpression: 'rate(5 minutes)'` cuyo target es `ReconcileFunction`, y el rol del scheduler solo puede invocar esa función.
+Schedule de reconciliación en `ApiStack`. **Tests:** existe `AWS::Scheduler::Schedule` con `ScheduleExpression: 'rate(5 minutes)'` cuyo target es `ReconcileFunction`, y el rol del scheduler solo puede invocar esa función.
 
 ### CL-09 · Verificación de seguridad y documentación — `feat/cl-09-security-verification`
 
