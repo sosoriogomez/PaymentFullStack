@@ -69,6 +69,17 @@ Severidad:
 
 ---
 
+## Alcance (v1.2)
+
+Criterio: se conserva todo lo que mejora la app que pide el enunciado (robustez del pago, seguridad, rendimiento, pruebas) y se retira lo que agrega una sección nueva que el enunciado no pide.
+
+| ID | Dónde | Cambio | Motivo |
+|---|---|---|---|
+| S-01 | CL-08, CL-07, overview | Se retira `MonitoringStack`: alarmas de CloudWatch, tópico SNS, presupuesto de AWS Budgets y dashboard, junto con la variable `ALARM_EMAIL`. Los costos estimados pasan a CL-09 | Es una funcionalidad nueva de operación; el enunciado pide publicar la app, no monitorearla. Los logs de CloudWatch se mantienen |
+| S-02 | FE-10, CL-06 | Lighthouse deja de ser un job de CI (que además necesitaba un servidor de datos simulados) y pasa a ser una medición manual con los resultados en el README | Da la misma evidencia para "imágenes que cargan rápido" sin agregar infraestructura de CI |
+
+---
+
 ## Verificaciones externas realizadas
 
 - La creación de transacciones usa la **llave privada** y exige `acceptance_token` + `accept_personal_auth` (política de privacidad y tratamiento de datos personales), como estaba en el spec.

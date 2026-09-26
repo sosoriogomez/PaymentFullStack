@@ -1,6 +1,6 @@
 # Spec Frontend — Checkout SPA
 
-> **Versión 1.1** — incorpora las correcciones de la revisión (ver [`CHANGELOG.md`](./CHANGELOG.md); los IDs `C-xx`/`I-xx`/`M-xx` remiten a ese registro).
+> **Versión 1.2** — incorpora las correcciones de la revisión y el ajuste de alcance S-02 (ver [`CHANGELOG.md`](./CHANGELOG.md); los IDs `C-xx`/`I-xx`/`M-xx` remiten a ese registro).
 
 > **Regla de nombres:** el repositorio es público y **no puede contener el nombre de la compañía evaluadora**. En código y textos se usa **Payment Gateway (PG)** / "pasarela". La URL y la llave pública de la pasarela se inyectan por variables de entorno de build.
 
@@ -39,7 +39,7 @@ Requisitos de la prueba que este spec cubre explícitamente:
 | Íconos de marca | `simple-icons` (CC0): exporta **datos** (`siVisa.path`, `siVisa.hex`, `siMastercard…`), no componentes; `CardBrandLogo` arma el `<svg>` con ellos (I-11) | Logos VISA/Mastercard sin assets externos |
 | Tests | **Jest 30** + `@swc/jest` (o `ts-jest`), `jest-environment-jsdom`, React Testing Library 16, `@testing-library/user-event`, `@testing-library/jest-dom`; polyfill `TextEncoder/TextDecoder` para React Router 7 en jsdom (I-13) | Requisito Jest |
 | Calidad | ESLint (typescript-eslint, `react-hooks`, `jsx-a11y`), Prettier, Stylelint, Husky + lint-staged | Clean code y accesibilidad verificables |
-| Performance | Lighthouse CI (GitHub Action) | Evidencia de "imágenes que cargan rápido" |
+| Performance | Lighthouse (manual, perfil móvil) | Evidencia de "imágenes que cargan rápido" |
 
 ---
 
@@ -310,7 +310,7 @@ Cada feature = **rama `feat/fe-XX-...` desde `main` + PR hacia `main`**. DoD com
 - CSS avanzado con propósito: container queries en `ProductCard`, `clamp()` para tipografía, `:has()` solo como mejora progresiva, animaciones con `transform/opacity`, soporte de modo oscuro por `prefers-color-scheme` vía tokens.
 - `scripts/optimize-images.mjs` (sharp) y verificación de peso (< 80 KB por variante 640 px).
 - Code splitting: `PaymentModal` y `TransactionStatusPage` con `React.lazy`.
-- Lighthouse CI en PR (móvil): Performance ≥ 90, Accessibility ≥ 95, LCP < 2.5 s, CLS < 0.1.
+- Medición con Lighthouse (móvil) antes de entregar, con los resultados en el README: objetivo Performance ≥ 90, Accessibility ≥ 95, LCP < 2.5 s, CLS < 0.1.
 - Matriz manual: Chrome, Firefox, Safari (macOS/iOS), Edge; capturas en README.
 
 ### FE-11 · Cobertura y documentación
