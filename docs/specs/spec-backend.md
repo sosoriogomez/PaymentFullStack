@@ -547,7 +547,7 @@ DATABASE_URL= | DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD (Secrets Manager
 DB_SSL_CA_PATH=                  # certs/global-bundle.pem en AWS; vacío en local
 DB_POOL_MAX=2
 CORS_ALLOWED_ORIGINS=
-APP_ENV=local                    # local | aws — con aws, el schema zod exige ORIGIN_VERIFY_SECRET (fail-fast)
+APP_ENV=local                    # local | aws — con aws, la app HTTP exige ORIGIN_VERIFY_SECRET al arrancar (fail-fast); las Lambdas migrate/reconcile no lo necesitan
 ORIGIN_VERIFY_SECRET=            # solo en AWS (Secrets Manager, generado por CDK — C-06)
 ```
 
