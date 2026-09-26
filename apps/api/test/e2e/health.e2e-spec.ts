@@ -1,28 +1,41 @@
-import { type INestApplication } from '@nestjs/common';
-import request from 'supertest';
-import { createTestApp } from '../support/test-app';
+import { createTestApp, type TestApp } from '../support/test-app';
 
 describe('GET /api/v1/health', () => {
-  let app: INestApplication;
+  let testApp: TestApp;
 
   beforeAll(async () => {
-    app = await createTestApp();
+    testApp = await createTestApp();
   });
 
   afterAll(async () => {
-    await app.close();
+    await testApp.close();
   });
 
-  it('should report ok when the service is running', async () => {
-    const response = await request(app.getHttpServer()).get('/api/v1/health');
+  it('should report ok when the service and the database are up', async () => {
+    const response = await testApp.api().get('/api/v1/health');
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({ status: 'ok' });
+    expect(response.body).toEqual({ status: 'ok', database: 'up' });
   });
 
   it('should respond 404 for unversioned routes', async () => {
-    const response = await request(app.getHttpServer()).get('/health');
+    const response = await testApp.api().get('/health');
 
     expect(response.status).toBe(404);
+  });
+
+  it('should respond 503 when the database is not reachable', async () => {
+    const query = jest
+      .spyOn(testApp.dataSource, 'query')
+      .mockRejectedValueOnce(new Error('connection refused'));
+
+    const response = await testApp.api().get('/api/v1/health');
+
+    expect(response.status).toBe(503);
+    expect(response.body).toMatchObject({
+      code: 'SERVICE_UNAVAILABLE',
+      detail: 'An unexpected error occurred',
+    });
+    query.mockRestore();
   });
 });
