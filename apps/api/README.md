@@ -59,7 +59,7 @@ sequenceDiagram
 Garantías del cobro:
 
 - **Nunca dos cobros.** El `Idempotency-Key` se combina con un *fingerprint* del pedido que excluye las credenciales de un solo uso (ADR-006). La misma key con el mismo pedido responde 200 como *replay*; con otro pedido, 422. Dos requests simultáneas con la misma key terminan en una sola fila por el `UNIQUE`, y hay un test de carrera real contra Postgres que lo verifica.
-- **Nunca un stock negativo.** El decremento es un `UPDATE … WHERE stock >= cantidad`. Si otra compra se llevó las unidades, la entrega queda `BACKORDERED` y se emite una alerta.
+- **Nunca un stock negativo.** El decremento es un `UPDATE … WHERE stock >= cantidad`. Si otra compra se llevó las unidades, la entrega queda `BACKORDERED` y el caso queda registrado en el log.
 - **Se finaliza una sola vez.** La guardia optimista `UPDATE … WHERE status = 'PENDING'` hace que el polling, el webhook y la reconciliación puedan correr a la vez. Con dos finalizaciones concurrentes hay un solo decremento y una sola entrega (test de integración).
 - **El cargo es exactamente el nuestro.** Si la pasarela reporta otra referencia, monto o moneda, la transacción queda `ERROR AMOUNT_MISMATCH` sin tocar el stock (I-06).
 - **Ninguna PENDING queda huérfana.** Una Lambda programada cada 5 minutos las sincroniza y, pasados 15 minutos sin registro en la pasarela, las marca como `ERROR EXPIRED_WITHOUT_GATEWAY_RECORD` (C-03, ADR-007).

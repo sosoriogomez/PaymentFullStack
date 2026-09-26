@@ -1,6 +1,6 @@
 # Checkout Onboarding — Visión general de specs
 
-> **Versión 1.1** — incorpora las correcciones de la revisión; el detalle de cada cambio y su motivo está en [`CHANGELOG.md`](./CHANGELOG.md). Los planes de implementación derivados están en [`../plans/`](../plans/).
+> **Versión 1.2** — incorpora las correcciones de la revisión y el ajuste de alcance (S-01, S-02); el detalle de cada cambio y su motivo está en [`CHANGELOG.md`](./CHANGELOG.md). Los planes de implementación derivados están en [`../plans/`](../plans/).
 
 Índice y hoja de ruta de los tres specs de implementación:
 
@@ -70,7 +70,7 @@ Orden recomendado (cada ítem = rama desde `main` + PR hacia `main`; commits peq
 | 5. Checkout | BE-04, BE-05, BE-06, FE-05, FE-06 | Modal con tarjeta, entrega, términos y tokenización |
 | 6. Pago | BE-07, BE-08, BE-09, FE-07, FE-08 | Pasos 3 → 4 → 5 con pagos aprobados y rechazados |
 | 7. Resiliencia y eventos | FE-09, BE-10, BE-14 (+ Scheduler y `ReconcileFunction` de CL-04) | Refresh en cualquier paso recupera el progreso; ninguna transacción queda PENDING aunque el cliente se vaya |
-| 8. Hardening | BE-11, FE-10, CL-08, CL-09 | Headers OWASP, responsive/cross-browser, alarmas |
+| 8. Hardening | BE-11, FE-10, CL-09 | Headers OWASP, responsive/cross-browser, verificación de seguridad |
 | 9. Cierre | BE-13, FE-11 | Swagger/Postman, cobertura y README final |
 
 ---
@@ -115,7 +115,7 @@ Orden recomendado (cada ítem = rama desde `main` + PR hacia `main`; commits peq
 | Rúbrica | Pts | Dónde se asegura |
 |---|---|---|
 | README completo | 5 | BE-13, FE-11, CL-09 (checklist abajo) |
-| Imágenes rápidas y sin salirse de la UI | 5 | FE-04, FE-10 (AVIF/WebP, srcset, Lighthouse CI), CL-05 (cache) |
+| Imágenes rápidas y sin salirse de la UI | 5 | FE-04, FE-10 (AVIF/WebP, srcset, Lighthouse), CL-05 (cache) |
 | Funcionalidad completa del onboarding | 20 | FE-04 … FE-09, BE-03 … BE-10, BE-14 |
 | API funcionando correctamente | 20 | BE-*, tests e2e, smoke tests CL-07 |
 | Cobertura > 80 % front y back | 30 | Umbrales 85 % en Jest, gate en CI |

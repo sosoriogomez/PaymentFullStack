@@ -27,7 +27,7 @@ export class Sha256Hasher implements Hasher {
   }
 }
 
-/** Alerts go to the application log with a stable `alert` field, ready for a metric filter. */
+/** Anomalies go to the application log with a stable `alert` field, easy to search for. */
 export class LoggerAlertLog implements AlertLog {
   private readonly logger = new Logger('Alerts');
 
