@@ -1,6 +1,6 @@
 # Spec Cloud — Infraestructura AWS, CI/CD y seguridad
 
-> **Versión 1.2** — incorpora las correcciones de la revisión y el ajuste de alcance S-01 (ver [`CHANGELOG.md`](./CHANGELOG.md); los IDs `C-xx`/`I-xx`/`M-xx` remiten a ese registro).
+> **Versión 1.2** — incorpora las correcciones de la revisión y los ajustes de alcance S-01 y S-03 (ver [`CHANGELOG.md`](./CHANGELOG.md); los IDs `C-xx`/`I-xx`/`M-xx` remiten a ese registro).
 
 > **Regla de nombres:** el repositorio es público y **no puede contener el nombre de la compañía evaluadora**. Recursos, stacks, variables y workflows usan nombres neutros (`checkout-*`, `PG_*`). La URL/host de la pasarela y sus llaves llegan desde GitHub Secrets/Variables y SSM, nunca desde el código.
 
@@ -90,7 +90,6 @@ infra/
 .github/
 ├── workflows/ci.yml
 ├── workflows/deploy.yml
-├── dependabot.yml
 └── pull_request_template.md
 ```
 
@@ -182,7 +181,7 @@ Cada feature = **rama `feat/cl-XX-...` desde `main` + PR hacia `main`**. DoD com
 5. **Guardas:** búsqueda de palabras prohibidas usando el secreto `FORBIDDEN_WORDS` (así la palabra no queda escrita en el repo) y de patrones de llaves; `npm audit --omit=dev --audit-level=high`.
 6. Publicar reportes de cobertura como artefactos.
 
-Branch protection en `main`: PR obligatorio + checks en verde. `dependabot.yml` semanal para npm y GitHub Actions.
+Branch protection en `main`: PR obligatorio + checks en verde.
 
 ### CL-07 · CD (despliegue continuo)
 
