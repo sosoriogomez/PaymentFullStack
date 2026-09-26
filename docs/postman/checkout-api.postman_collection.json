@@ -1,0 +1,816 @@
+{
+  "info": {
+    "name": "Checkout API",
+    "description": "Checkout paid by card through a payment gateway (sandbox: no real money). Set `baseUrl` (local: http://localhost:3000/api/v1; deployed: https://<distribution>/api/v1), `pgBaseUrl` (sandbox URL of the gateway) and `pgPublicKey`, then run the folders in order. Errors are application/problem+json (RFC 9457).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "pgBaseUrl",
+      "value": "",
+      "description": "Sandbox URL of the payment gateway"
+    },
+    {
+      "key": "pgPublicKey",
+      "value": "",
+      "description": "Public (sandbox) key of the gateway"
+    },
+    {
+      "key": "productId",
+      "value": ""
+    },
+    {
+      "key": "customerId",
+      "value": ""
+    },
+    {
+      "key": "acceptanceToken",
+      "value": ""
+    },
+    {
+      "key": "personalDataToken",
+      "value": ""
+    },
+    {
+      "key": "cardToken",
+      "value": ""
+    },
+    {
+      "key": "idempotencyKey",
+      "value": ""
+    },
+    {
+      "key": "transactionId",
+      "value": ""
+    },
+    {
+      "key": "deliveryId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Catalog",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/health"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/products"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const inStock = pm.response.json().items.find((p) => p.stock > 0);",
+                  "pm.collectionVariables.set('productId', inStock.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get product",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/products/{{productId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get stock",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/products/{{productId}}/stock"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Checkout",
+      "item": [
+        {
+          "name": "Quote",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/checkout/quote?productId={{productId}}&quantity=1"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('total = product + fees', () => {",
+                  "  const a = pm.response.json().amounts;",
+                  "  pm.expect(a.total).to.eql(a.product + a.baseFee + a.deliveryFee);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Acceptance tokens",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/checkout/acceptance"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('acceptanceToken', body.acceptanceToken);",
+                  "pm.collectionVariables.set('personalDataToken', body.personalDataAuthToken);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/customers",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Ana Pérez\",\n  \"email\": \"ana@example.com\",\n  \"phone\": \"3001234567\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 new or 200 existing', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                  "pm.test('masked', () => pm.expect(pm.response.json().email).to.include('***'));",
+                  "pm.collectionVariables.set('customerId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get customer (masked)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/customers/{{customerId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Approved payment (4242)",
+      "item": [
+        {
+          "name": "Tokenize card 4242 (gateway)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{pgPublicKey}}"
+              }
+            ],
+            "url": "{{pgBaseUrl}}/tokens/cards",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"number\": \"4242424242424242\",\n  \"cvc\": \"123\",\n  \"exp_month\": \"12\",\n  \"exp_year\": \"30\",\n  \"card_holder\": \"Ana Pérez\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Runs in the browser in the real app (public key): the card number never reaches the Checkout API. Sandbox test cards only."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('card tokenized by the gateway', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                  "pm.collectionVariables.set('cardToken', pm.response.json().data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": "{{baseUrl}}/transactions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 1,\n  \"customerId\": \"{{customerId}}\",\n  \"delivery\": {\n    \"recipientName\": \"Ana Pérez\",\n    \"recipientPhone\": \"3001234567\",\n    \"addressLine1\": \"Cra 43A # 1-50\",\n    \"addressLine2\": \"Apto 301\",\n    \"city\": \"Medellín\",\n    \"region\": \"Antioquia\",\n    \"country\": \"CO\",\n    \"postalCode\": \"050021\"\n  },\n  \"payment\": {\n    \"cardToken\": \"{{cardToken}}\",\n    \"installments\": 1,\n    \"acceptanceToken\": \"{{acceptanceToken}}\",\n    \"acceptPersonalAuth\": \"{{personalDataToken}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('idempotencyKey', pm.variables.replaceIn('{{$guid}}'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 PENDING with Location', () => {",
+                  "  pm.response.to.have.status(201);",
+                  "  pm.expect(pm.response.headers.get('Location')).to.include('/transactions/');",
+                  "});",
+                  "pm.collectionVariables.set('transactionId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Replay: same key, same purchase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": "{{baseUrl}}/transactions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 1,\n  \"customerId\": \"{{customerId}}\",\n  \"delivery\": {\n    \"recipientName\": \"Ana Pérez\",\n    \"recipientPhone\": \"3001234567\",\n    \"addressLine1\": \"Cra 43A # 1-50\",\n    \"addressLine2\": \"Apto 301\",\n    \"city\": \"Medellín\",\n    \"region\": \"Antioquia\",\n    \"country\": \"CO\",\n    \"postalCode\": \"050021\"\n  },\n  \"payment\": {\n    \"cardToken\": \"{{cardToken}}\",\n    \"installments\": 1,\n    \"acceptanceToken\": \"{{acceptanceToken}}\",\n    \"acceptPersonalAuth\": \"{{personalDataToken}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 replay, no second charge', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.headers.get('Idempotent-Replayed')).to.eql('true');",
+                  "  pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get('transactionId'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get transaction (poll until final)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/transactions/{{transactionId}}",
+            "description": "Repeat until status is not PENDING (the SPA polls every 2-5 s)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "if (body.deliveryId) pm.collectionVariables.set('deliveryId', body.deliveryId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Find by Idempotency-Key",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/transactions?idempotencyKey={{idempotencyKey}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get delivery",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/deliveries/{{deliveryId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Stock after the purchase",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/products/{{productId}}/stock"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Declined payment (4111)",
+      "item": [
+        {
+          "name": "Tokenize card 4111 (gateway)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{pgPublicKey}}"
+              }
+            ],
+            "url": "{{pgBaseUrl}}/tokens/cards",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"number\": \"4111111111111111\",\n  \"cvc\": \"123\",\n  \"exp_month\": \"12\",\n  \"exp_year\": \"30\",\n  \"card_holder\": \"Ana Pérez\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Runs in the browser in the real app (public key): the card number never reaches the Checkout API. Sandbox test cards only."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('card tokenized by the gateway', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                  "pm.collectionVariables.set('cardToken', pm.response.json().data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": "{{baseUrl}}/transactions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 1,\n  \"customerId\": \"{{customerId}}\",\n  \"delivery\": {\n    \"recipientName\": \"Ana Pérez\",\n    \"recipientPhone\": \"3001234567\",\n    \"addressLine1\": \"Cra 43A # 1-50\",\n    \"addressLine2\": \"Apto 301\",\n    \"city\": \"Medellín\",\n    \"region\": \"Antioquia\",\n    \"country\": \"CO\",\n    \"postalCode\": \"050021\"\n  },\n  \"payment\": {\n    \"cardToken\": \"{{cardToken}}\",\n    \"installments\": 1,\n    \"acceptanceToken\": \"{{acceptanceToken}}\",\n    \"acceptPersonalAuth\": \"{{personalDataToken}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('idempotencyKey', pm.variables.replaceIn('{{$guid}}'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('transactionId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get transaction (poll until DECLINED)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/transactions/{{transactionId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('no delivery for a declined payment', () => pm.expect(pm.response.json().deliveryId).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Errors",
+      "item": [
+        {
+          "name": "422: same key, another purchase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": "{{baseUrl}}/transactions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 2,\n  \"customerId\": \"{{customerId}}\",\n  \"delivery\": {\n    \"recipientName\": \"Ana Pérez\",\n    \"recipientPhone\": \"3001234567\",\n    \"addressLine1\": \"Cra 43A # 1-50\",\n    \"addressLine2\": \"Apto 301\",\n    \"city\": \"Medellín\",\n    \"region\": \"Antioquia\",\n    \"country\": \"CO\",\n    \"postalCode\": \"050021\"\n  },\n  \"payment\": {\n    \"cardToken\": \"{{cardToken}}\",\n    \"installments\": 1,\n    \"acceptanceToken\": \"{{acceptanceToken}}\",\n    \"acceptPersonalAuth\": \"{{personalDataToken}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422 IDEMPOTENCY_CONFLICT', () => {",
+                  "  pm.response.to.have.status(422);",
+                  "  pm.expect(pm.response.json().code).to.eql('IDEMPOTENCY_CONFLICT');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "400: missing Idempotency-Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/transactions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 1,\n  \"customerId\": \"{{customerId}}\",\n  \"delivery\": {\n    \"recipientName\": \"Ana Pérez\",\n    \"recipientPhone\": \"3001234567\",\n    \"addressLine1\": \"Cra 43A # 1-50\",\n    \"addressLine2\": \"Apto 301\",\n    \"city\": \"Medellín\",\n    \"region\": \"Antioquia\",\n    \"country\": \"CO\",\n    \"postalCode\": \"050021\"\n  },\n  \"payment\": {\n    \"cardToken\": \"{{cardToken}}\",\n    \"installments\": 1,\n    \"acceptanceToken\": \"{{acceptanceToken}}\",\n    \"acceptPersonalAuth\": \"{{personalDataToken}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('400', () => pm.response.to.have.status(400));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "400: amounts are never accepted",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": "{{baseUrl}}/transactions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 1,\n  \"customerId\": \"{{customerId}}\",\n  \"delivery\": {\n    \"recipientName\": \"Ana Pérez\",\n    \"recipientPhone\": \"3001234567\",\n    \"addressLine1\": \"Cra 43A # 1-50\",\n    \"addressLine2\": \"Apto 301\",\n    \"city\": \"Medellín\",\n    \"region\": \"Antioquia\",\n    \"country\": \"CO\",\n    \"postalCode\": \"050021\"\n  },\n  \"payment\": {\n    \"cardToken\": \"{{cardToken}}\",\n    \"installments\": 1,\n    \"acceptanceToken\": \"{{acceptanceToken}}\",\n    \"acceptPersonalAuth\": \"{{personalDataToken}}\"\n  },\n  \"amountInCents\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 VALIDATION_ERROR', () => pm.expect(pm.response.json().code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "409: more units than in stock",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/checkout/quote?productId={{productId}}&quantity=10",
+            "description": "409 INSUFFICIENT_STOCK when the product has fewer than 10 units."
+          }
+        },
+        {
+          "name": "404: unknown transaction",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/transactions/00000000-0000-4000-8000-000000000000"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('404', () => pm.response.to.have.status(404));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "401: event with a wrong checksum",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/payment-events",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"transaction.updated\",\n  \"data\": {\n    \"transaction\": {\n      \"id\": \"x\",\n      \"reference\": \"TX-X\",\n      \"status\": \"APPROVED\",\n      \"amount_in_cents\": 1,\n      \"currency\": \"COP\"\n    }\n  },\n  \"signature\": {\n    \"properties\": [\n      \"transaction.id\",\n      \"transaction.status\",\n      \"transaction.amount_in_cents\"\n    ],\n    \"checksum\": \"0000000000000000000000000000000000000000000000000000000000000000\"\n  },\n  \"timestamp\": 1790866800\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 INVALID_EVENT_SIGNATURE', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
