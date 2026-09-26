@@ -20,6 +20,9 @@ env:
 jobs:
   deploy:
     name: deploy
+    # Skipped (not failed) until the repository is connected to AWS: the role comes from the
+    # one-off OIDC stack (infra/README.md). Job conditions only see repository variables.
+    if: vars.AWS_DEPLOY_ROLE_ARN != ''
     runs-on: ubuntu-latest
     environment: production
     steps:

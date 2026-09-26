@@ -172,7 +172,7 @@ Cada feature = **rama `feat/cl-XX-...` desde `main` + PR hacia `main`**. DoD com
 
 ### CL-06 · CI (pull requests)
 
-`ci.yml` en cada PR y push:
+`ci.yml` en cada PR, en cada push a `main` y a mano (`workflow_dispatch`):
 
 1. `npm ci` con caché; jobs en paralelo `api`, `web`, `infra`.
 2. **api:** lint → typecheck → `dependency-cruiser` → `jest --coverage` (umbral 85 %; Testcontainers usa el Docker del runner) → `build:lambda` (tsc + esbuild) → smoke `node -e "require('./dist-lambda/lambda.js')"`.
@@ -185,7 +185,7 @@ Branch protection en `main`: PR obligatorio + checks en verde.
 
 ### CL-07 · CD (despliegue continuo)
 
-`deploy.yml` en push a `main` (y `workflow_dispatch`):
+`deploy.yml` en push a `main` (y `workflow_dispatch`). Mientras la variable de repositorio `AWS_DEPLOY_ROLE_ARN` no exista, el job se omite en vez de fallar:
 
 0. **Prerrequisito manual único (I-17):** `cdk bootstrap` y `cdk deploy -a "npx ts-node bin/bootstrap-oidc.ts"` → `GithubOidcStack` crea el OIDC provider de GitHub y el rol de despliegue. Trust policy: `token.actions.githubusercontent.com:aud = sts.amazonaws.com` y `sub = repo:<owner>/<repo>:ref:refs/heads/main`. Permisos: solo `sts:AssumeRole` sobre `arn:aws:iam::<account>:role/cdk-*` (los roles de bootstrap hacen el resto), más `s3:*` sobre el bucket web, `cloudfront:CreateInvalidation` y `lambda:InvokeFunction` sobre `MigrateFunction`.
 1. `aws-actions/configure-aws-credentials` con **OIDC** asumiendo ese rol.
