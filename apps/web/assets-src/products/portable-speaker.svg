@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3ecff"/><stop offset="1" stop-color="#dac8ff"/></linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2d2250"/><stop offset=".5" stop-color="#4b3a86"/><stop offset="1" stop-color="#2d2250"/></linearGradient>
+    <pattern id="grill" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="14" cy="14" r="6" fill="#1b1433"/></pattern>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#1d0b44" stop-opacity=".28"/><stop offset="1" stop-color="#1d0b44" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg)"/>
+  <circle cx="190" cy="740" r="230" fill="#ffffff" opacity=".3"/>
+  <ellipse cx="600" cy="775" rx="260" ry="40" fill="url(#shadow)"/>
+  <rect x="400" y="150" width="400" height="610" rx="200" fill="url(#body)"/>
+  <rect x="440" y="250" width="320" height="420" rx="150" fill="url(#grill)" opacity=".9"/>
+  <rect x="540" y="175" width="120" height="30" rx="15" fill="#8b7bd8"/>
+  <circle cx="600" cy="715" r="16" fill="#c9bcff"/>
+  <path d="M870 380 q60 70 0 140 M920 340 q100 110 0 220" fill="none" stroke="#7a5cff" stroke-width="16" stroke-linecap="round" opacity=".7"/>
+</svg>
