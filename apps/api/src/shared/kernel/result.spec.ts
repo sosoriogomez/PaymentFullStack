@@ -1,4 +1,14 @@
-import { andThen, combine, err, fromPredicate, map, mapErr, ok, type Result } from './result';
+import {
+  andThen,
+  combine,
+  combineObject,
+  err,
+  fromPredicate,
+  map,
+  mapErr,
+  ok,
+  type Result,
+} from './result';
 
 describe('Result helpers', () => {
   const double = (n: number) => n * 2;
@@ -25,6 +35,16 @@ describe('Result helpers', () => {
     expect(combine([ok(1), ok(2), ok(3)])).toEqual(ok([1, 2, 3]));
     expect(combine([ok(1), err('a'), err('b')])).toEqual(err('a'));
     expect(combine([])).toEqual(ok([]));
+  });
+
+  it('should combine a record of results keeping its keys or returning the first error', () => {
+    const typed: Result<{ a: number; b: string }, string> = combineObject({
+      a: ok(1),
+      b: ok('x'),
+    });
+
+    expect(typed).toEqual(ok({ a: 1, b: 'x' }));
+    expect(combineObject({ a: ok(1), b: err('first'), c: err('second') })).toEqual(err('first'));
   });
 
   it('should build a result from a predicate', () => {

@@ -47,6 +47,9 @@ export class FakePaymentGateway implements PaymentGateway {
   private readonly failures = new Map<GatewayOperation, GatewayError>();
   private readonly byId = new Map<string, StoredTransaction>();
 
+  /** Distinct prefixes keep gateway ids unique when several fakes share one database. */
+  constructor(private readonly idPrefix = 'fake') {}
+
   willCharge(plan: ChargePlan): this {
     this.plan = plan;
     return this;
@@ -109,7 +112,7 @@ export class FakePaymentGateway implements PaymentGateway {
 
   private record(request: CardChargeRequest): GatewayTransaction {
     const transaction: GatewayTransaction = {
-      id: `fake-${String(this.byId.size + 1).padStart(4, '0')}`,
+      id: `${this.idPrefix}-${String(this.byId.size + 1).padStart(4, '0')}`,
       reference: request.reference,
       status: this.plan.initial,
       statusMessage: null,

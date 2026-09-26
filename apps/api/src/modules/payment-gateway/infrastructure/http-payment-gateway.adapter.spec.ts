@@ -1,8 +1,13 @@
-import { fakeGatewayFetch, fixture, json } from '../../../../test/support/fake-gateway-fetch';
+import { Logger } from '@nestjs/common';
+import {
+  type FakeAnswer,
+  fakeGatewayFetch,
+  fixture,
+  json,
+} from '../../../../test/support/fake-gateway-fetch';
 import { type PaymentGatewaySettings } from '../../../shared/infrastructure/config/app-config.service';
 import { err } from '../../../shared/kernel/result';
 import { type CardChargeRequest } from '../domain/payment-gateway.port';
-import { type FakeAnswer } from '../../../../test/support/fake-gateway-fetch';
 import { HttpPaymentGatewayAdapter } from './http-payment-gateway.adapter';
 
 const settings: PaymentGatewaySettings = {
@@ -57,6 +62,11 @@ const callOf = (fetchFn: ReturnType<typeof fakeGatewayFetch>, index = 0) => {
     body: typeof init?.body === 'string' ? JSON.parse(init.body) : undefined,
   };
 };
+
+// The adapter logs rejections and bad answers on purpose; keep the test output readable.
+beforeAll(() => {
+  Logger.overrideLogger(false);
+});
 
 describe('HttpPaymentGatewayAdapter', () => {
   describe('getAcceptanceTokens', () => {

@@ -38,6 +38,21 @@ export function combine<T, E>(results: readonly Result<T, E>[]): Result<T[], E> 
   return ok(values);
 }
 
+type OkValues<R> = { -readonly [K in keyof R]: R[K] extends Result<infer T, unknown> ? T : never };
+type ErrorOf<R> = R extends Err<infer E> ? E : never;
+
+/** Record version of `combine`: all ok → ok with the same keys; otherwise the first error. */
+export function combineObject<R extends Readonly<Record<string, Result<unknown, unknown>>>>(
+  results: R,
+): Result<OkValues<R>, ErrorOf<R[keyof R]>> {
+  const values: Record<string, unknown> = {};
+  for (const [key, result] of Object.entries(results)) {
+    if (!result.ok) return result as Err<ErrorOf<R[keyof R]>>;
+    values[key] = result.value;
+  }
+  return ok(values as OkValues<R>);
+}
+
 export const fromPredicate = <T, E>(
   value: T,
   predicate: (value: T) => boolean,
