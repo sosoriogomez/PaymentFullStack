@@ -27,7 +27,10 @@ export default tseslint.config(
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
       'max-lines': ['warn', { max: 160, skipBlankLines: true, skipComments: true }],
       'no-console': ['error', { allow: ['error'] }],
       'no-restricted-syntax': [
@@ -52,11 +55,10 @@ export default tseslint.config(
   {
     files: ['src/features/**/*.{ts,tsx}'],
     rules: {
-      'no-restricted-imports': layerRule('Una feature no depende de app/ (solo de hooks tipados).', [
-        '@/app/store',
-        '@/app/router',
-        '@/app/App',
-      ]),
+      'no-restricted-imports': layerRule(
+        'Una feature no depende de app/ (solo de hooks tipados).',
+        ['@/app/store', '@/app/router', '@/app/App'],
+      ),
     },
   },
   {
