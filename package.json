@@ -6,7 +6,9 @@
   "engines": {
     "node": ">=22"
   },
-  "workspaces": [],
+  "workspaces": [
+    "apps/api"
+  ],
   "scripts": {
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
