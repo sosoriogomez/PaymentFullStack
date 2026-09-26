@@ -1,12 +1,14 @@
-import { Body, Controller, Get, HttpStatus, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Query, Res } from '@nestjs/common';
 import { type Response } from 'express';
 import {
   IDEMPOTENT_REPLAYED_HEADER,
   IdempotencyKey,
 } from '../../../../shared/infrastructure/http/idempotency-key';
 import { unwrapOrThrow } from '../../../../shared/infrastructure/http/unwrap';
+import { uuidParam } from '../../../../shared/infrastructure/http/uuid-param';
 import { CreateTransaction } from '../../application/create-transaction.use-case';
 import { FindTransactionByIdempotencyKey } from '../../application/find-transaction-by-idempotency-key.use-case';
+import { GetTransaction } from '../../application/get-transaction.use-case';
 import {
   CreateTransactionRequest,
   FindTransactionQuery,
@@ -19,6 +21,7 @@ export class TransactionsController {
   constructor(
     private readonly createTransaction: CreateTransaction,
     private readonly findByIdempotencyKey: FindTransactionByIdempotencyKey,
+    private readonly getTransaction: GetTransaction,
   ) {}
 
   /**
@@ -48,5 +51,11 @@ export class TransactionsController {
       await this.findByIdempotencyKey.execute(query.idempotencyKey.toLowerCase()),
     );
     return TransactionResponse.from(view);
+  }
+
+  /** Status of a transaction; a PENDING one is synced with the gateway first (polling). */
+  @Get(':id')
+  async get(@Param('id', uuidParam('id')) id: string): Promise<TransactionResponse> {
+    return TransactionResponse.from(unwrapOrThrow(await this.getTransaction.execute(id)));
   }
 }

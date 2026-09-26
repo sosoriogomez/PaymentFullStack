@@ -1,4 +1,5 @@
-import { CryptoIdGenerator, Sha256Hasher, SystemClock } from './kernel-adapters';
+import { Logger } from '@nestjs/common';
+import { CryptoIdGenerator, LoggerAlertLog, Sha256Hasher, SystemClock } from './kernel-adapters';
 
 describe('kernel adapters', () => {
   it('should read the system time', () => {
@@ -19,5 +20,17 @@ describe('kernel adapters', () => {
     expect(new Sha256Hasher().sha256('abc')).toBe(
       'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
     );
+  });
+
+  it('should log alerts as JSON with a stable alert field', () => {
+    const warn = jest.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined);
+    const error = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    const alerts = new LoggerAlertLog();
+
+    alerts.warn('BACKORDERED', { transactionId: 't1', quantity: 2 });
+    alerts.error('AMOUNT_MISMATCH', { transactionId: 't1' });
+
+    expect(warn).toHaveBeenCalledWith('{"alert":"BACKORDERED","transactionId":"t1","quantity":2}');
+    expect(error).toHaveBeenCalledWith('{"alert":"AMOUNT_MISMATCH","transactionId":"t1"}');
   });
 });

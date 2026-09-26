@@ -25,6 +25,20 @@ export class TypeOrmProductRepository implements ProductRepository {
     return row ? toProduct(row) : null;
   }
 
+  async decrementStockIfAvailable(
+    productId: string,
+    quantity: number,
+    tx?: TransactionContext,
+  ): Promise<boolean> {
+    const result = await this.repository(tx)
+      .createQueryBuilder()
+      .update()
+      .set({ stock: () => 'stock - :quantity' })
+      .where('id = :productId AND stock >= :quantity', { productId, quantity })
+      .execute();
+    return result.affected === 1;
+  }
+
   private repository(tx?: TransactionContext) {
     return managerFor(this.dataSource, tx).getRepository(ProductOrmEntity);
   }

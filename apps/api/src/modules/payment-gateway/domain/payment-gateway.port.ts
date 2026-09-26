@@ -4,8 +4,11 @@ import { type Result } from '../../../shared/kernel/result';
 export const GATEWAY_STATUSES = ['PENDING', 'APPROVED', 'DECLINED', 'VOIDED', 'ERROR'] as const;
 export type GatewayTransactionStatus = (typeof GATEWAY_STATUSES)[number];
 
-export const isFinalGatewayStatus = (status: GatewayTransactionStatus): boolean =>
-  status !== 'PENDING';
+export type FinalGatewayStatus = Exclude<GatewayTransactionStatus, 'PENDING'>;
+
+export const isFinalGatewayStatus = (
+  status: GatewayTransactionStatus,
+): status is FinalGatewayStatus => status !== 'PENDING';
 
 /** Contracts the customer must accept explicitly before paying (privacy policy and personal data). */
 export interface AcceptanceTokens {
@@ -48,6 +51,13 @@ export interface GatewayTransaction {
   readonly currency: string;
   readonly card: { readonly brand: string; readonly lastFour: string } | null;
 }
+
+/** A charge the gateway already settled: APPROVED, DECLINED, VOIDED or ERROR. */
+export type FinalGatewayTransaction = GatewayTransaction & { readonly status: FinalGatewayStatus };
+
+export const isFinalGatewayTransaction = (
+  transaction: GatewayTransaction,
+): transaction is FinalGatewayTransaction => isFinalGatewayStatus(transaction.status);
 
 export type GatewayError = Extract<
   DomainError,
