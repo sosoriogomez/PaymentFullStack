@@ -1,6 +1,6 @@
 # Spec Cloud — Infraestructura AWS, CI/CD y seguridad
 
-> **Versión 1.2** — incorpora las correcciones de la revisión y los ajustes de alcance S-01 y S-03 (ver [`CHANGELOG.md`](./CHANGELOG.md); los IDs `C-xx`/`I-xx`/`M-xx` remiten a ese registro).
+> **Versión 1.2** — incorpora las correcciones de la revisión y los ajustes de alcance S-01, S-03 y S-04 (ver [`CHANGELOG.md`](./CHANGELOG.md); los IDs `C-xx`/`I-xx`/`M-xx` remiten a ese registro).
 
 > **Regla de nombres:** el repositorio es público y **no puede contener el nombre de la compañía evaluadora**. Recursos, stacks, variables y workflows usan nombres neutros (`checkout-*`, `PG_*`). La URL/host de la pasarela y sus llaves llegan desde GitHub Secrets/Variables y SSM, nunca desde el código.
 
@@ -178,7 +178,7 @@ Cada feature = **rama `feat/cl-XX-...` desde `main` + PR hacia `main`**. DoD com
 2. **api:** lint → typecheck → `dependency-cruiser` → `jest --coverage` (umbral 85 %; Testcontainers usa el Docker del runner) → `build:lambda` (tsc + esbuild) → smoke `node -e "require('./dist-lambda/lambda.js')"`.
 3. **web:** lint → stylelint → typecheck → `jest --coverage` → build.
 4. **infra:** `cdk synth` (con `cdk-nag`; necesita el artefacto `dist-lambda/` del job api o un placeholder) → tests de assertions.
-5. **Guardas:** búsqueda de palabras prohibidas usando el secreto `FORBIDDEN_WORDS` (así la palabra no queda escrita en el repo) y de patrones de llaves; `npm audit --omit=dev --audit-level=high`.
+5. **Guardas:** búsqueda de patrones de llaves de la pasarela; `npm audit --omit=dev --audit-level=high`.
 6. Publicar reportes de cobertura como artefactos.
 
 Branch protection en `main`: PR obligatorio + checks en verde.
