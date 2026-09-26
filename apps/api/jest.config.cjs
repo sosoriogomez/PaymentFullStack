@@ -1,11 +1,20 @@
 /** @type {import('jest').Config} */
+/** @nestjs/swagger plugin for ts-jest: the e2e tests read the document `nest build` gets. */
+const SWAGGER_PLUGIN = { path: '<rootDir>/test/support/swagger-plugin.transformer.cjs' };
+
 const project = (displayName, testMatch, extra = {}) => ({
   displayName,
   testMatch,
   ...extra,
   testEnvironment: 'node',
   moduleFileExtensions: ['ts', 'js', 'json'],
-  transform: { '^.+\\.ts$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json' }] },
+  // Every project compiles with the plugin: the same instrumented code, so coverage merges cleanly.
+  transform: {
+    '^.+\\.ts$': [
+      'ts-jest',
+      { tsconfig: '<rootDir>/tsconfig.json', astTransformers: { before: [SWAGGER_PLUGIN] } },
+    ],
+  },
   moduleNameMapper: {
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
     '^@modules/(.*)$': '<rootDir>/src/modules/$1',
