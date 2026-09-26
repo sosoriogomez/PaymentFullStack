@@ -118,7 +118,7 @@ export type DomainError =
   | { code: 'VALIDATION_ERROR'; details: FieldError[] }
   | { code: 'PRODUCT_NOT_FOUND'; productId: string }
   | { code: 'CUSTOMER_NOT_FOUND'; customerId: string }
-  | { code: 'TRANSACTION_NOT_FOUND'; transactionId: string }
+  | { code: 'TRANSACTION_NOT_FOUND'; by: 'id' | 'idempotencyKey'; value: string }
   | { code: 'DELIVERY_NOT_FOUND'; deliveryId: string }
   | { code: 'INSUFFICIENT_STOCK'; available: number; requested: number }
   | { code: 'IDEMPOTENCY_CONFLICT' }

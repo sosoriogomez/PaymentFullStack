@@ -24,12 +24,12 @@ export class Email {
 export class ColombianPhone {
   private constructor(readonly value: string) {}
 
-  static parse(raw: string): Result<ColombianPhone, DomainError> {
+  static parse(raw: string, field = 'phone'): Result<ColombianPhone, DomainError> {
     const value = raw.trim();
     return COLOMBIAN_MOBILE.test(value)
       ? ok(new ColombianPhone(value))
       : err(
-          validationError('phone', 'must be a Colombian mobile number (10 digits starting with 3)'),
+          validationError(field, 'must be a Colombian mobile number (10 digits starting with 3)'),
         );
   }
 }

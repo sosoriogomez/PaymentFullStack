@@ -8,7 +8,11 @@ export type DomainError =
   | { readonly code: 'VALIDATION_ERROR'; readonly details: readonly FieldError[] }
   | { readonly code: 'PRODUCT_NOT_FOUND'; readonly productId: string }
   | { readonly code: 'CUSTOMER_NOT_FOUND'; readonly customerId: string }
-  | { readonly code: 'TRANSACTION_NOT_FOUND'; readonly transactionId: string }
+  | {
+      readonly code: 'TRANSACTION_NOT_FOUND';
+      readonly by: 'id' | 'idempotencyKey';
+      readonly value: string;
+    }
   | { readonly code: 'DELIVERY_NOT_FOUND'; readonly deliveryId: string }
   | { readonly code: 'INSUFFICIENT_STOCK'; readonly available: number; readonly requested: number }
   | { readonly code: 'IDEMPOTENCY_CONFLICT'; readonly idempotencyKey: string }
