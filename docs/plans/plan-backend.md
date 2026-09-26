@@ -233,14 +233,14 @@ Orden alineado con la hoja de ruta del overview. Cada feature indica rama, pasos
 1. `data-source.ts` exportando un `DataSourceOptions` único para la app y para la CLI; `entities: [ProductOrmEntity, …]` y `migrations: [InitialSchema1700000000000]` como arrays de clases; `poolSize`/`extra.max` desde `DB_POOL_MAX`; `ssl` con `ca` cuando `DB_SSL_CA_PATH` existe.
 2. `bigint.transformer.ts` + test de tabla (C-05).
 3. Migración inicial escrita a mano y revisada: `CREATE EXTENSION IF NOT EXISTS citext`, enums `transaction_status` y `delivery_status`, `CHECK`s de montos y stock, índices y uniques del ER (spec §4.1).
-4. `UnitOfWork` (puerto) + `TypeOrmUnitOfWork`:
+4. `UnitOfWork` (puerto en `shared/kernel`) + `TypeOrmUnitOfWork`. El trabajo recibe un `TransactionContext` **opaco** que los casos de uso pasan a los métodos de repositorio que deben participar en la transacción; solo los adaptadores saben que adentro hay un `EntityManager` (`managerFor(dataSource, tx)`). Así ningún módulo importa adaptadores de otro:
    ```ts
-   async run<T, E>(work: (repos: TransactionalRepositories) => Promise<Result<T, E>>): Promise<Result<T, E>> {
+   async run<T, E>(work: (tx: TransactionContext) => Promise<Result<T, E>>): Promise<Result<T, E>> {
      const runner = this.dataSource.createQueryRunner();
      await runner.connect();
      await runner.startTransaction();
      try {
-       const result = await work(this.repositoriesFor(runner.manager));
+       const result = await work(contextFor(runner.manager));
        await (result.ok ? runner.commitTransaction() : runner.rollbackTransaction());
        return result;
      } catch (error) {
