@@ -14,6 +14,8 @@ export const MAX_STATUS_MESSAGE_LENGTH = 255;
 
 /** Status message of a transaction the gateway charged with other data than ours (I-06). */
 export const AMOUNT_MISMATCH = 'AMOUNT_MISMATCH';
+/** The charge never reached the gateway (e.g. the Lambda died between INSERT and POST). */
+export const EXPIRED_WITHOUT_GATEWAY_RECORD = 'EXPIRED_WITHOUT_GATEWAY_RECORD';
 
 /** What the gateway reports about a charge. */
 export interface ChargeRecord {

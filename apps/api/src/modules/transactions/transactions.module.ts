@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AppConfigService } from '../../shared/infrastructure/config/app-config.service';
 import { DataSource } from 'typeorm';
 import {
   ALERT_LOG,
@@ -42,6 +43,7 @@ import { FinalizeTransaction } from './application/finalize-transaction.use-case
 import { FindTransactionByIdempotencyKey } from './application/find-transaction-by-idempotency-key.use-case';
 import { GetTransaction } from './application/get-transaction.use-case';
 import { HandlePaymentEvent } from './application/handle-payment-event.use-case';
+import { ReconcilePendingTransactions } from './application/reconcile-pending-transactions.use-case';
 import { SyncTransactionStatus } from './application/sync-transaction-status.use-case';
 import { TransactionViews } from './application/transaction-views';
 import { REFERENCE_GENERATOR, type ReferenceGenerator } from './domain/reference-generator.port';
@@ -174,6 +176,18 @@ import { UlidReferenceGenerator } from './infrastructure/references/ulid-referen
         transactions: TransactionRepository,
         finalize: FinalizeTransaction,
       ) => new HandlePaymentEvent(verifier, transactions, finalize),
+    },
+    {
+      provide: ReconcilePendingTransactions,
+      inject: [TRANSACTION_REPOSITORY, SyncTransactionStatus, CLOCK, ALERT_LOG, AppConfigService],
+      useFactory: (
+        transactions: TransactionRepository,
+        sync: SyncTransactionStatus,
+        clock: Clock,
+        alerts: AlertLog,
+        config: AppConfigService,
+      ) =>
+        new ReconcilePendingTransactions(transactions, sync, clock, alerts, config.reconciliation),
     },
   ],
   exports: [TRANSACTION_REPOSITORY, FinalizeTransaction, SyncTransactionStatus],
