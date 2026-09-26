@@ -1,0 +1,26 @@
+{
+  "name": "checkout-onboarding",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Checkout de un producto pagado con tarjeta a través de una pasarela de pagos (sandbox)",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [],
+  "scripts": {
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.9.9"
+  }
+}
