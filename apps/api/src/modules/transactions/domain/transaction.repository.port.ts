@@ -18,6 +18,8 @@ export interface TransactionRepository {
   findById(id: string, tx?: TransactionContext): Promise<Transaction | null>;
   findByIdempotencyKey(idempotencyKey: string): Promise<Transaction | null>;
   findByReference(reference: string): Promise<Transaction | null>;
+  /** PENDING created before `cutoff`, oldest first (index on status, created_at). */
+  findPendingOlderThan(cutoff: Date, limit: number): Promise<Transaction[]>;
 }
 
 export const TRANSACTION_REPOSITORY = Symbol('TransactionRepository');

@@ -37,6 +37,15 @@ export class InMemoryTransactionRepository implements TransactionRepository {
     return Promise.resolve(this.all.find((stored) => stored.reference === reference) ?? null);
   }
 
+  findPendingOlderThan(cutoff: Date, limit: number): Promise<Transaction[]> {
+    return Promise.resolve(
+      this.all
+        .filter((stored) => stored.status === 'PENDING' && stored.createdAt < cutoff)
+        .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+        .slice(0, limit),
+    );
+  }
+
   findByIdempotencyKey(idempotencyKey: string): Promise<Transaction | null> {
     return Promise.resolve(
       this.all.find((stored) => stored.idempotencyKey === idempotencyKey) ?? null,

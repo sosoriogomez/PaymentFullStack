@@ -1,4 +1,4 @@
-import { type DataSource } from 'typeorm';
+import { type DataSource, LessThan } from 'typeorm';
 import { managerFor } from '../../../../shared/infrastructure/database/typeorm-unit-of-work';
 import { isUniqueViolation } from '../../../../shared/infrastructure/database/unique-violation';
 import { type TransactionContext } from '../../../../shared/kernel/unit-of-work';
@@ -52,6 +52,15 @@ export class TypeOrmTransactionRepository implements TransactionRepository {
   async findByReference(reference: string): Promise<Transaction | null> {
     const row = await this.repository().findOneBy({ reference });
     return row ? toTransaction(row) : null;
+  }
+
+  async findPendingOlderThan(cutoff: Date, limit: number): Promise<Transaction[]> {
+    const rows = await this.repository().find({
+      where: { status: 'PENDING', createdAt: LessThan(cutoff) },
+      order: { createdAt: 'ASC' },
+      take: limit,
+    });
+    return rows.map(toTransaction);
   }
 
   private repository(tx?: TransactionContext) {

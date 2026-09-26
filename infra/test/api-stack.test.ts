@@ -50,6 +50,36 @@ describe('ApiStack', () => {
     });
   });
 
+  it('should reconcile PENDING transactions every 5 minutes without the client (C-03)', () => {
+    template.hasResourceProperties('AWS::Lambda::Function', {
+      FunctionName: 'checkout-prod-reconcile',
+      Handler: 'reconcile.handler',
+      Timeout: 120,
+      Environment: { Variables: Match.objectLike({ APP_ENV: 'aws' }) },
+    });
+    template.hasResourceProperties('AWS::Scheduler::Schedule', {
+      Name: 'checkout-prod-reconcile',
+      ScheduleExpression: 'rate(5 minutes)',
+      State: 'ENABLED',
+      FlexibleTimeWindow: { Mode: 'OFF' },
+      Target: Match.objectLike({
+        Arn: Match.anyValue(),
+        RetryPolicy: { MaximumEventAgeInSeconds: 240, MaximumRetryAttempts: 0 },
+      }),
+    });
+    template.hasResourceProperties('AWS::IAM::Role', {
+      AssumeRolePolicyDocument: {
+        Statement: Match.arrayWith([
+          Match.objectLike({ Principal: { Service: 'scheduler.amazonaws.com' } }),
+        ]),
+      },
+    });
+    const reconcileEnv = template.findResources('AWS::Lambda::Function', {
+      Properties: { FunctionName: 'checkout-prod-reconcile' },
+    });
+    expect(JSON.stringify(reconcileEnv)).not.toContain('ORIGIN_VERIFY_SECRET_ARN');
+  });
+
   it('should not reserve concurrency by default (C-02)', () => {
     template.resourcePropertiesCountIs(
       'AWS::Lambda::Function',
@@ -129,6 +159,7 @@ describe('ApiStack', () => {
   it('should export the endpoint and function names for the pipeline', () => {
     template.hasOutput('ApiEndpoint', {});
     template.hasOutput('MigrateFunctionName', {});
+    template.hasOutput('ReconcileFunctionName', {});
     expect(api.workerEnvironment.APP_ENV).toBe('aws');
   });
 
