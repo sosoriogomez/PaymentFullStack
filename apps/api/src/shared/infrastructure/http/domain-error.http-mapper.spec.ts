@@ -6,7 +6,7 @@ describe('toProblem', () => {
     [{ code: 'VALIDATION_ERROR', details: [] }, 400],
     [{ code: 'PRODUCT_NOT_FOUND', productId: 'p' }, 404],
     [{ code: 'CUSTOMER_NOT_FOUND', customerId: 'c' }, 404],
-    [{ code: 'TRANSACTION_NOT_FOUND', transactionId: 't' }, 404],
+    [{ code: 'TRANSACTION_NOT_FOUND', by: 'id', value: 't' }, 404],
     [{ code: 'DELIVERY_NOT_FOUND', deliveryId: 'd' }, 404],
     [{ code: 'INSUFFICIENT_STOCK', available: 1, requested: 2 }, 409],
     [{ code: 'INVALID_STATE_TRANSITION', from: 'APPROVED', to: 'DECLINED' }, 409],

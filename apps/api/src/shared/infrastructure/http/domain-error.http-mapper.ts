@@ -31,7 +31,7 @@ const PROBLEMS: ProblemTable = {
   }),
   TRANSACTION_NOT_FOUND: (e) => ({
     status: HttpStatus.NOT_FOUND,
-    detail: `Transaction ${e.transactionId} was not found`,
+    detail: `No transaction with ${e.by} ${e.value}`,
   }),
   DELIVERY_NOT_FOUND: (e) => ({
     status: HttpStatus.NOT_FOUND,
