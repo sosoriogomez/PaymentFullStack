@@ -90,4 +90,4 @@ Estas herramientas necesitan la URL pública, así que se corren después de cad
 
 ## Dependencias
 
-`npm audit --omit=dev --audit-level=high` corre en CI en cada push (job `audit`). Dependabot abre PRs semanales.
+`npm audit --omit=dev --audit-level=high` corre en CI en cada PR y en cada push a `main` (job `audit`): una vulnerabilidad alta en una dependencia de producción hace fallar el CI. Las versiones están fijadas en `package-lock.json`.
