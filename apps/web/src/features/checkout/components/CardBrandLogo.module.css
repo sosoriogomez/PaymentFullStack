@@ -1,0 +1,9 @@
+@layer components {
+  .logo {
+    inline-size: 2rem;
+    block-size: 2rem;
+    padding: 2px;
+    background: var(--color-surface-raised);
+    border-radius: var(--radius-sm);
+  }
+}
