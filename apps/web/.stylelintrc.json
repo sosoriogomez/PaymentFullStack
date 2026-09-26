@@ -3,11 +3,19 @@
   "rules": {
     "selector-class-pattern": [
       "^[a-z][a-zA-Z0-9]+$",
-      { "message": "Las clases de CSS Modules usan camelCase (se importan como styles.nombre)" }
+      {
+        "message": "Las clases de CSS Modules usan camelCase (se importan como styles.nombre)"
+      }
     ],
     "custom-property-pattern": "^[a-z][a-z0-9-]*$",
     "declaration-no-important": true,
-    "max-nesting-depth": 2
+    "max-nesting-depth": 2,
+    "media-feature-range-notation": [
+      "prefix",
+      {
+        "message": "min-width/max-width: la sintaxis de rango no existe en iOS 15 (iPhone SE 2020)"
+      }
+    ]
   },
   "overrides": [
     {
@@ -15,18 +23,29 @@
       "rules": {
         "color-no-hex": [
           true,
-          { "message": "Usa tokens de color (var(--color-*)), no valores literales" }
+          {
+            "message": "Usa tokens de color (var(--color-*)), no valores literales"
+          }
         ],
-        "color-named": ["never", { "message": "Usa tokens de color (var(--color-*))" }],
+        "color-named": [
+          "never",
+          {
+            "message": "Usa tokens de color (var(--color-*))"
+          }
+        ],
         "function-disallowed-list": [
           ["rgb", "rgba", "hsl", "hsla"],
-          { "message": "Usa tokens de color" }
+          {
+            "message": "Usa tokens de color"
+          }
         ]
       }
     },
     {
       "files": ["src/styles/reset.css"],
-      "rules": { "selector-class-pattern": null }
+      "rules": {
+        "selector-class-pattern": null
+      }
     }
   ]
 }
