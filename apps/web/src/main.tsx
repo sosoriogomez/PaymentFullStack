@@ -7,12 +7,13 @@ import { RouterProvider } from 'react-router/dom';
 import { createBrowserServices } from './app/composition';
 import { createAppRouter } from './app/router';
 import { createAppStore } from './app/store';
+import { registerPollingListener } from './features/transaction/polling.listener';
 import { env } from './shared/config/env';
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Root element #root not found');
 
-const store = createAppStore(createBrowserServices(env));
+const store = createAppStore(createBrowserServices(env), undefined, [registerPollingListener]);
 const router = createAppRouter();
 
 createRoot(container).render(

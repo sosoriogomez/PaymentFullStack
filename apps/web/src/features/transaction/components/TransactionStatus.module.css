@@ -1,0 +1,107 @@
+@layer components {
+  .page {
+    display: grid;
+    gap: var(--space-6);
+    max-inline-size: 36rem;
+    margin-inline: auto;
+  }
+
+  .header {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-3);
+    text-align: center;
+  }
+
+  .icon {
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+    padding: var(--space-3);
+    border-radius: var(--radius-pill);
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .success .icon {
+    color: var(--color-success);
+    stroke: currentcolor;
+    background: var(--color-success-soft);
+  }
+
+  .failure .icon {
+    color: var(--color-danger);
+    stroke: currentcolor;
+    background: var(--color-danger-soft);
+  }
+
+  .title {
+    font-size: var(--text-2xl);
+  }
+
+  .text {
+    color: var(--color-text-muted);
+  }
+
+  .details {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .detailRow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-4);
+  }
+
+  .detailRow dt {
+    color: var(--color-text-muted);
+  }
+
+  .detailRow dd {
+    margin: 0;
+    font-weight: var(--weight-medium);
+    overflow-wrap: anywhere;
+  }
+
+  .detailRow .reference {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
+
+  .delivery {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .subtitle {
+    font-size: var(--text-lg);
+  }
+
+  .muted {
+    color: var(--color-text-muted);
+  }
+
+  .actions {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .countdown {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+}

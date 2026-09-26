@@ -11,6 +11,14 @@ import { type UiError, toUiError } from '@/shared/lib/ui-error';
 /** Leaves the checkout and forgets everything about it (also clears the transaction slice). */
 export const checkoutReset = createAction('checkout/reset');
 
+/**
+ * After a failed final status: that transaction is over, so the next attempt gets a new
+ * Idempotency-Key. The delivery draft stays; the card must be entered again (ADR-006).
+ */
+export const retryWithAnotherCard = createAction<{ productId: string; quantity: number }>(
+  'checkout/retryWithAnotherCard',
+);
+
 /** Terms the customer must accept, loaded every time the payment form opens (never persisted). */
 export const fetchAcceptance = createAppAsyncThunk<Acceptance>(
   'checkout/fetchAcceptance',
