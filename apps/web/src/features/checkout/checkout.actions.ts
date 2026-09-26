@@ -19,6 +19,12 @@ export const retryWithAnotherCard = createAction<{ productId: string; quantity: 
   'checkout/retryWithAnotherCard',
 );
 
+/** After a refresh: normalizes the restored step (spec §2.4). The card token never survives it. */
+export const checkoutRecovered = createAction('checkout/recovered');
+
+/** A refresh interrupted the POST and no transaction exists for the key: pay again, same key. */
+export const paymentRecoveryFailed = createAction('checkout/paymentRecoveryFailed');
+
 /** Terms the customer must accept, loaded every time the payment form opens (never persisted). */
 export const fetchAcceptance = createAppAsyncThunk<Acceptance>(
   'checkout/fetchAcceptance',

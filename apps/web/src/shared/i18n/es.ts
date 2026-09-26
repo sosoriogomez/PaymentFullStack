@@ -18,6 +18,7 @@ export const es = {
   },
   checkout: {
     modalTitle: 'Pago con tarjeta',
+    recovering: 'Estamos verificando el estado de tu pago…',
     continue: 'Continuar',
     close: 'Cerrar',
     delivery: {
