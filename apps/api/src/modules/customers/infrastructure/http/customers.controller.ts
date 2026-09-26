@@ -1,4 +1,6 @@
 import { Body, Controller, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
+import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiProblems } from '../../../../shared/infrastructure/http/openapi';
 import { type Response } from 'express';
 import { unwrapOrThrow } from '../../../../shared/infrastructure/http/unwrap';
 import { uuidParam } from '../../../../shared/infrastructure/http/uuid-param';
@@ -7,6 +9,8 @@ import { RegisterCustomer } from '../../application/register-customer.use-case';
 import { CustomerResponse } from './customer.response';
 import { RegisterCustomerRequest } from './register-customer.request';
 
+@ApiTags('customers')
+@ApiProblems(429)
 @Controller({ path: 'customers', version: '1' })
 export class CustomersController {
   constructor(
@@ -15,6 +19,10 @@ export class CustomersController {
   ) {}
 
   /** Upsert by email: 201 + Location when new, 200 when the email already existed. */
+  @ApiOperation({ summary: 'Registers a guest customer, or updates it when the email exists' })
+  @ApiCreatedResponse({ type: CustomerResponse, description: 'New customer (Location header)' })
+  @ApiOkResponse({ type: CustomerResponse, description: 'The email already existed' })
+  @ApiProblems(400, 413)
   @Post()
   async register(
     @Body() body: RegisterCustomerRequest,
@@ -26,6 +34,8 @@ export class CustomersController {
     return CustomerResponse.from(customer);
   }
 
+  @ApiOperation({ summary: 'A customer, with email and phone masked' })
+  @ApiProblems(400, 404)
   @Get(':id')
   async get(@Param('id', uuidParam('id')) id: string): Promise<CustomerResponse> {
     return CustomerResponse.from(unwrapOrThrow(await this.getCustomer.execute(id)));
