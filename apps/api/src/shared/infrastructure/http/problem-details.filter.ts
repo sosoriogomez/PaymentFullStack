@@ -80,9 +80,10 @@ export class ProblemDetailsFilter implements ExceptionFilter {
     return INTERNAL_ERROR;
   }
 
+  /** 4xx messages are meant for the client; 5xx keep their status but never their message. */
   private fromHttpException(exception: HttpException): ProblemResponse {
     const status = exception.getStatus();
-    if (status >= 500) return INTERNAL_ERROR;
-    return { status, code: codeForStatus(status), detail: exception.message };
+    const detail = status >= 500 ? INTERNAL_ERROR.detail : exception.message;
+    return { status, code: codeForStatus(status), detail };
   }
 }
