@@ -20,6 +20,17 @@ export interface WebStackProps extends StackProps {
 export const ORIGIN_VERIFY_HEADER = 'X-Origin-Verify';
 
 /** One HTTPS entry point: CloudFront serves the SPA (S3) and forwards /api/* to the HTTP API. */
+/** Request headers the API reads; everything else stays at the edge. */
+export const API_FORWARDED_HEADERS = [
+  'Accept',
+  'Content-Type',
+  'Origin',
+  'Idempotency-Key',
+  'X-Request-Id',
+  'X-Event-Checksum',
+  'CloudFront-Viewer-Address',
+] as const;
+
 export class WebStack extends Stack {
   readonly bucket: s3.Bucket;
   readonly distribution: cloudfront.Distribution;
@@ -53,6 +64,16 @@ export class WebStack extends Stack {
         [ORIGIN_VERIFY_HEADER]: props.originVerifySecret.secretValue.unsafeUnwrap(),
       },
     });
+    // Only what the API reads, plus the viewer address for per-IP limits (I-01). Never Host:
+    // API Gateway answers for its own domain. Managed policies with "all viewer headers" cannot
+    // include CloudFront headers.
+    const apiOriginRequest = new cloudfront.OriginRequestPolicy(this, 'ApiOriginRequest', {
+      originRequestPolicyName: resourceName(config, 'api-origin-request'),
+      comment: 'Headers and query strings the checkout API needs',
+      headerBehavior: cloudfront.OriginRequestHeaderBehavior.allowList(...API_FORWARDED_HEADERS),
+      queryStringBehavior: cloudfront.OriginRequestQueryStringBehavior.all(),
+      cookieBehavior: cloudfront.OriginRequestCookieBehavior.none(),
+    });
     const apiBehavior = (
       policy: cloudfront.IResponseHeadersPolicy,
     ): cloudfront.BehaviorOptions => ({
@@ -60,8 +81,7 @@ export class WebStack extends Stack {
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
       cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
-      // Forwards viewer headers (and CloudFront-Viewer-Address for per-IP throttling, I-01), not Host.
-      originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
+      originRequestPolicy: apiOriginRequest,
       responseHeadersPolicy: policy,
     });
 

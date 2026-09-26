@@ -159,7 +159,7 @@ Cada feature = **rama `feat/cl-XX-...` desde `main` + PR hacia `main`**. DoD com
 - Bucket S3: `BlockPublicAccess.BLOCK_ALL`, `enforceSSL`, cifrado S3-managed, `autoDeleteObjects` solo en stages no prod.
 - Distribución CloudFront:
   - **Default behavior** → S3 vía **OAC** (`S3BucketOrigin.withOriginAccessControl`), `CachePolicy.CACHING_OPTIMIZED`, `redirect-to-https`, compresión Brotli/Gzip, HTTP/2 + HTTP/3, CloudFront Function `spa-rewrite` (viewer-request: rutas sin extensión → `/index.html`).
-  - **`/api/*`** → `HttpOrigin(<apiId>.execute-api.us-east-1.amazonaws.com)` con custom header `X-Origin-Verify` (valor desde el secreto de C-06), `CACHING_DISABLED`, `ALL_VIEWER_EXCEPT_HOST_HEADER` (reenvía también `CloudFront-Viewer-Address`, que la API usa para el throttling por IP — I-01; se verifica con un test de assertions sobre la política), métodos `ALL`.
+  - **`/api/*`** → `HttpOrigin(<apiId>.execute-api.us-east-1.amazonaws.com)` con custom header `X-Origin-Verify` (valor desde el secreto de C-06), `CACHING_DISABLED`, política de *origin request* propia con allowlist (`Accept`, `Content-Type`, `Origin`, `Idempotency-Key`, `X-Request-Id`, `X-Event-Checksum` y `CloudFront-Viewer-Address`, que la API usa para el throttling por IP — I-01), todos los query strings, sin cookies ni `Host` (I-21; se verifica con un test de assertions), métodos `ALL`.
   - `defaultRootObject: index.html`, `priceClass: PRICE_CLASS_100`, access logs opcionales.
 - **Response Headers Policy (web):**
   - `Strict-Transport-Security: max-age=63072000; includeSubDomains` (sin `preload`: no aplica sobre `*.cloudfront.net`; se añade solo con dominio propio — I-12)

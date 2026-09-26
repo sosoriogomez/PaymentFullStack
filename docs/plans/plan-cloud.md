@@ -133,7 +133,7 @@ function handler(event) {
 - Bucket privado: `BlockPublicAccess.BLOCK_ALL`, `enforceSSL`, cifrado S3-managed, versioning apagado.
 - `Distribution`:
   - Default → `S3BucketOrigin.withOriginAccessControl(bucket)`, `CACHING_OPTIMIZED`, `REDIRECT_TO_HTTPS`, compresión, `SpaRewriteFunction` en `VIEWER_REQUEST`, política de headers web.
-  - `/api/*` → `HttpOrigin(<apiId>.execute-api.us-east-1.amazonaws.com)` con `customHeaders: { 'X-Origin-Verify': originSecret.secretValue.unsafeUnwrap() }` (se sintetiza como *dynamic reference*, no como texto), `CACHING_DISABLED`, `ALL_VIEWER_EXCEPT_HOST_HEADER`, `ALLOW_ALL` methods, política de headers de API.
+  - `/api/*` → `HttpOrigin(<apiId>.execute-api.us-east-1.amazonaws.com)` con `customHeaders: { 'X-Origin-Verify': originSecret.secretValue.unsafeUnwrap() }` (se sintetiza como *dynamic reference*, no como texto), `CACHING_DISABLED`, origin request policy propia (allowlist + `CloudFront-Viewer-Address`, sin `Host` — I-21), `ALLOW_ALL` methods, política de headers de API.
   - `/api/docs*` → mismo origen, política de headers de docs (CSP que admite los assets de Swagger UI del mismo origen).
   - `httpVersion: HTTP2_AND_3`, `priceClass: PRICE_CLASS_100`, `defaultRootObject: 'index.html'`.
 - Política web: HSTS sin `preload` (I-12), CSP del spec CL-05 con `connect-src 'self' https://<PG_HOST>` (`pgHost` desde contexto ← GitHub Variables), `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, `Cross-Origin-Opener-Policy: same-origin`.
@@ -246,7 +246,7 @@ template.hasResourceProperties('AWS::ApiGatewayV2::Stage', {
 
 ### CL-05 · Web y edge — `feat/cl-05-web-edge`
 
-§3.4. **Tests:** la función SPA está asociada solo al behavior por defecto; `/api/*` usa `CachingDisabled` y `AllViewerExceptHostHeader`; la política web contiene CSP, HSTS sin `preload`, `DENY` y `nosniff`; el header `X-Origin-Verify` es un *dynamic reference* (no un literal). Test unitario de `spa-rewrite.js` (rutas con y sin extensión). **Aceptación:** refresh en `/transactions/<id>` sirve la SPA; `GET /api/v1/products/<uuid-inexistente>` devuelve 404 JSON; Observatory ≥ A.
+§3.4. **Tests:** la función SPA está asociada solo al behavior por defecto; `/api/*` usa `CachingDisabled` y la origin request policy propia (con `CloudFront-Viewer-Address`, sin `Host`); la política web contiene CSP, HSTS sin `preload`, `DENY` y `nosniff`; el header `X-Origin-Verify` es un *dynamic reference* (no un literal). Test unitario de `spa-rewrite.js` (rutas con y sin extensión). **Aceptación:** refresh en `/transactions/<id>` sirve la SPA; `GET /api/v1/products/<uuid-inexistente>` devuelve 404 JSON; Observatory ≥ A.
 
 ### CL-07 · CD — `feat/cl-07-deploy`
 
