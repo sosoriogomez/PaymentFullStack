@@ -22,9 +22,10 @@ jobs:
     name: deploy
     # Skipped (not failed) until the repository is connected to AWS: the role comes from the
     # one-off OIDC stack (infra/README.md). Job conditions only see repository variables.
+    # No `environment:` on purpose: it would turn the OIDC subject into `environment:<name>`,
+    # and the deploy role only trusts `ref:refs/heads/main` (I-22).
     if: vars.AWS_DEPLOY_ROLE_ARN != ''
     runs-on: ubuntu-latest
-    environment: production
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

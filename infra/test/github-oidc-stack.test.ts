@@ -47,6 +47,12 @@ describe('GithubOidcStack', () => {
     });
   });
 
+  it('should print the role ARN that GitHub needs', () => {
+    template.hasOutput('DeployRoleArn', {
+      Value: { 'Fn::GetAtt': [Match.stringLikeRegexp('^DeployRole'), 'Arn'] },
+    });
+  });
+
   it('should delegate infrastructure changes to the CDK bootstrap roles', () => {
     template.hasResourceProperties('AWS::IAM::Policy', {
       PolicyDocument: {
