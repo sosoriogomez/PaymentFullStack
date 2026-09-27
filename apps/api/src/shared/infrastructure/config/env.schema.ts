@@ -43,7 +43,6 @@ export const envSchema = z
     PG_GET_TIMEOUT_MS: integer(1).default(4000),
     PG_GET_MAX_RETRIES: integer(0).default(2),
     PG_DEADLINE_MS: integer(1).default(12000),
-    ACCEPTANCE_CACHE_TTL_SECONDS: integer(0).default(300),
 
     BASE_FEE_IN_CENTS: integer(0).default(300_000),
     DELIVERY_FEE_IN_CENTS: integer(0).default(1_000_000),
