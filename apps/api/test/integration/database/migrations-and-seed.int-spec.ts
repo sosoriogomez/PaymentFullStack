@@ -26,7 +26,10 @@ describe('migrateAndSeed on an empty database', () => {
   it('should create the schema and seed the catalog on the first run', async () => {
     const report = await migrateAndSeed(dataSource);
 
-    expect(report.executedMigrations).toEqual(['InitialSchema1790380800000']);
+    expect(report.executedMigrations).toEqual([
+      'InitialSchema1790380800000',
+      'RestockCatalog1790532600000',
+    ]);
     expect(report.seededProducts).toBe(PRODUCT_SEEDS.length);
   });
 

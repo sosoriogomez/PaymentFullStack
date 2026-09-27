@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { MIGRATIONS } from '../../../src/database/migrations';
 import { runMigrationTask } from '../../../src/migrate';
 import { type SecretSources } from '../../../src/bootstrap/secrets-loader';
 import { databaseUrl, withAdminClient } from '../../support/database/template';
@@ -29,7 +30,7 @@ describe('runMigrationTask (migrate Lambda)', () => {
     const first = await runMigrationTask({ ...env }, noSecrets);
     const second = await runMigrationTask({ ...env }, noSecrets);
 
-    expect(first.executedMigrations).toHaveLength(1);
+    expect(first.executedMigrations).toHaveLength(MIGRATIONS.length);
     expect(first.seededProducts).toBe(5);
     expect(second.executedMigrations).toEqual([]);
   });

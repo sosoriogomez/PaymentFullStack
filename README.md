@@ -123,7 +123,7 @@ npm run lint && npm run typecheck
 
 | Workspace | Tests | Statements | Branches | Functions | Lines |
 |---|---|---|---|---|---|
-| API ([detalle](apps/api/README.md#pruebas-y-cobertura)) | 474 (335 unit, 39 integración, 100 e2e) | 99.08 % | 95.31 % | 98.65 % | 99.55 % |
+| API ([detalle](apps/api/README.md#pruebas-y-cobertura)) | 476 (335 unit, 41 integración, 100 e2e) | 99.08 % | 95.31 % | 98.65 % | 99.55 % |
 | SPA ([detalle](apps/web/README.md#pruebas-y-cobertura)) | 327 | 97.50 % | 94.24 % | 98.18 % | 99.72 % |
 | Infraestructura ([detalle](infra/README.md#pruebas)) | 54 | 100 % | 88.23 % | 100 % | 100 % |
 
