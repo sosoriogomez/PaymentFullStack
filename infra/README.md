@@ -48,8 +48,11 @@ Requisitos: una cuenta de AWS, AWS CLI con credenciales de administrador (solo p
 
 2. **Rol de despliegue para GitHub (OIDC).** Solo confía en la rama `main` del repositorio indicado. Una cuenta admite un solo proveedor OIDC de GitHub; si `aws iam list-open-id-connect-providers` ya muestra `token.actions.githubusercontent.com`, el stack falla al crearlo de nuevo.
 
+   `repository` se escribe como aparece en el `sub` del token de GitHub. Los repositorios creados desde el 15-07-2026 usan el formato inmutable, con los IDs del dueño y del repositorio (I-23); los anteriores, `<owner>/<repo>`:
+
    ```bash
-   cd infra && npx cdk deploy -a "npx tsx bin/bootstrap-oidc.ts" -c repository=<owner>/<repo>
+   REPOSITORY=$(curl -s https://api.github.com/repos/<owner>/<repo> | jq -r '"\(.owner.login)@\(.owner.id)/\(.name)@\(.id)"')
+   cd infra && npx cdk deploy -a "npx tsx bin/bootstrap-oidc.ts" -c repository="$REPOSITORY"
    ```
 
    El output `DeployRoleArn` es el valor de la variable `AWS_DEPLOY_ROLE_ARN` del paso 4. El job de deploy no declara `environment:`: con uno, GitHub firmaría el token con `sub = repo:…:environment:<nombre>` y el rol lo rechazaría (I-22).
@@ -119,4 +122,4 @@ npm test -w infra                                        # aserciones sobre las 
 npm run synth -w infra -- -c pgHost=gateway.example      # synth completo, como en CI
 ```
 
-**52 tests en 10 suites**, sin snapshots completos. Cada stack tiene un test que falla ante cualquier hallazgo de `cdk-nag` sin justificación escrita. Cobertura: 100 % de statements, funciones y líneas, y 90.47 % de branches.
+**54 tests en 10 suites**, sin snapshots completos. Cada stack tiene un test que falla ante cualquier hallazgo de `cdk-nag` sin justificación escrita. Cobertura: 100 % de statements, funciones y líneas, y 88.23 % de branches.
