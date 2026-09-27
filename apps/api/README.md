@@ -153,7 +153,7 @@ Cobertura de la corrida completa (umbral de CI: 85 %):
 
 | Statements | Branches | Functions | Lines |
 |---|---|---|---|
-| 99.08 % | 95.37 % | 98.66 % | 99.55 % |
+| 99.08 % | 95.31 % | 98.65 % | 99.55 % |
 
 ## Lambda
 

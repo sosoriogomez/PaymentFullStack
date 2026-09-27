@@ -92,13 +92,14 @@ El build apunta a Chrome/Edge 107+, Firefox 104+ y Safari/iOS 15+ (`vite.config.
 - Las imágenes van en AVIF, WebP y JPG a 320, 640 y 960 px con `srcset`/`sizes` y dimensiones explícitas (sin CLS). La primera se pide con `fetchpriority="high"` y el resto con `loading="lazy"`.
 - La variante de 640 px más pesada ocupa 14.7 KB; `npm run images` falla si alguna supera 80 KB.
 
-Lighthouse 12 en perfil móvil (throttling simulado), contra el build de producción servido con `vite preview` y la API local:
+Lighthouse 12 en perfil móvil (throttling simulado):
 
-| Performance | Accessibility | Best Practices | LCP | CLS | TBT |
-|---|---|---|---|---|---|
-| 96 | 100 | 100 | 2.5 s | 0 | 70 ms |
+| Dónde | Performance | Accessibility | Best Practices | LCP | CLS | TBT |
+|---|---|---|---|---|---|---|
+| Producción (CloudFront), mediana de 3 corridas | 92 | 100 | 100 | 2.9 s | 0 | 120 ms |
+| Local: `vite preview` y la API local | 96 | 100 | 100 | 2.5 s | 0 | 70 ms |
 
-`vite preview` no comprime las respuestas; CloudFront sí, así que en AWS el LCP baja. Para medir sobre el deploy: Chrome DevTools → Lighthouse → *Mobile*.
+La medición de producción se hizo desde un entorno que sale a internet por un proxy HTTPS, que suma latencia a cada petición; desde un navegador normal el LCP es menor. Para repetirla: Chrome DevTools → Lighthouse → *Mobile* sobre la URL del deploy.
 
 ## Pruebas y cobertura
 

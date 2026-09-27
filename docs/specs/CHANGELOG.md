@@ -92,4 +92,7 @@ Criterio: se conserva todo lo que mejora la app que pide el enunciado (robustez 
 - La creación de transacciones usa la **llave privada** y exige `acceptance_token` + `accept_personal_auth` (política de privacidad y tratamiento de datos personales), como estaba en el spec.
 - esbuild no soporta `emitDecoratorMetadata` (confirma C-01).
 - Lambda ofrece `nodejs24.x` y CDK expone `Runtime.NODEJS_24_X` (confirma I-08).
-- **Pendiente de verificar en los spikes** (el entorno de revisión no tenía salida a la sandbox): CORS de `/tokens/cards` (I-20), forma exacta de las respuestas y formato de teléfonos (I-19).
+- **Verificado en producción (2026-09-27):**
+  - **CORS de `/tokens/cards` (I-20):** el *preflight* desde el origen de CloudFront responde con `access-control-allow-origin: *` y la tokenización desde el navegador funciona. El plan B del ADR-002 no hace falta.
+  - **Respuestas y teléfonos (I-19):** una compra aprobada y una rechazada contra la sandbox pasaron por los esquemas zod de respuesta, y la pasarela aceptó los teléfonos en el formato del spec.
+  - **Tokens de aceptación:** cada consulta al comercio devuelve uno nuevo, con su propio `jit`, y la transacción que lo usa lo consume (I-25).

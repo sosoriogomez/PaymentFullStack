@@ -1,6 +1,6 @@
 # ADR-002 · Tokenización de la tarjeta en el cliente
 
-- **Estado:** Aceptada (pendiente de confirmar CORS en la sandbox, ver *Verificación*)
+- **Estado:** Aceptada. CORS confirmado en producción (ver *Verificación*)
 - **Fecha:** 2026-09-26
 - **Feature:** FE-02
 
@@ -34,3 +34,9 @@ El entorno donde se escribió esta decisión no tenía salida de red hacia la sa
 
 1. Con `npm run dev -w apps/web` y un `.env` local con la URL y la llave pública de la sandbox, abrir el modal de pago y tokenizar `4242 4242 4242 4242`.
 2. Si el navegador bloquea la petición por CORS, activar el **plan B** sin tocar el dominio ni los componentes: un endpoint `POST /api/v1/card-tokens` en la API que reenvía el cuerpo a la pasarela, no lo persiste ni lo loguea (redact) y no toca la base de datos; en el front solo cambia el adaptador de `CardTokenizer`.
+
+**Resultado (2026-09-27, sobre producción).** La tokenización desde el navegador funciona y el plan B no hace falta:
+
+- **Preflight:** un `OPTIONS /v1/tokens/cards` con el origen de CloudFront responde 200 con `access-control-allow-origin: *`, los métodos permitidos incluyen `POST` y las cabeceras permitidas incluyen `Authorization` y `Content-Type`.
+- **CSP:** la política de la SPA permite ese host en `connect-src`.
+- **Compras:** una aprobada (`4242 4242 4242 4242`) y una rechazada (`4111 1111 1111 1111`) se tokenizaron desde el navegador y terminaron en su estado final.
