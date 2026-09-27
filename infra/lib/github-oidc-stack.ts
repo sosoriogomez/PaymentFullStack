@@ -1,4 +1,4 @@
-import { Duration, Stack, type StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Duration, Stack, type StackProps } from 'aws-cdk-lib';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { NagSuppressions } from 'cdk-nag';
 import { type Construct } from 'constructs';
@@ -42,6 +42,10 @@ export class GithubOidcStack extends Stack {
       }),
     });
     this.grantDeployment(props.stage);
+    new CfnOutput(this, 'DeployRoleArn', {
+      value: this.deployRole.roleArn,
+      description: 'Value of the AWS_DEPLOY_ROLE_ARN variable of the GitHub repository',
+    });
   }
 
   private grantDeployment(stage: string): void {

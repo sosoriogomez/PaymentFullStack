@@ -43,20 +43,25 @@ Requisitos: una cuenta de AWS, AWS CLI con credenciales de administrador (solo p
 1. **Bootstrap de CDK** en `us-east-1`, una vez por cuenta:
 
    ```bash
-   cd infra && npx cdk bootstrap aws://<account-id>/us-east-1
+   cd infra && npx cdk bootstrap aws://$(aws sts get-caller-identity --query Account --output text)/us-east-1
    ```
 
-2. **Rol de despliegue para GitHub (OIDC).** Solo confía en la rama `main` del repositorio indicado:
+2. **Rol de despliegue para GitHub (OIDC).** Solo confía en la rama `main` del repositorio indicado. Una cuenta admite un solo proveedor OIDC de GitHub; si `aws iam list-open-id-connect-providers` ya muestra `token.actions.githubusercontent.com`, el stack falla al crearlo de nuevo.
 
    ```bash
    npx cdk deploy -a "npx tsx bin/bootstrap-oidc.ts" -c repository=<owner>/<repo>
    ```
 
-3. **Llaves de la pasarela en SSM** (`SecureString`, bajo `/checkout/prod/`). El script las lee del entorno y las pasa por stdin, así que no quedan en el historial de la shell:
+   El output `DeployRoleArn` es el valor de la variable `AWS_DEPLOY_ROLE_ARN` del paso 4. El job de deploy no declara `environment:`: con uno, GitHub firmaría el token con `sub = repo:…:environment:<nombre>` y el rol lo rechazaría (I-22).
+
+3. **Llaves de la pasarela en SSM** (`SecureString`, bajo `/checkout/prod/`). Desde la raíz del repositorio. `read -rs` pide cada secreto sin mostrarlo ni dejarlo en el historial, y el script lo pasa a AWS por stdin:
 
    ```bash
-   export PG_BASE_URL=... PG_PUBLIC_KEY=... PG_PRIVATE_KEY=... PG_INTEGRITY_SECRET=... PG_EVENTS_SECRET=...
+   read -r PG_BASE_URL; read -r PG_PUBLIC_KEY
+   read -rs PG_PRIVATE_KEY; read -rs PG_INTEGRITY_SECRET; read -rs PG_EVENTS_SECRET
+   export PG_BASE_URL PG_PUBLIC_KEY PG_PRIVATE_KEY PG_INTEGRITY_SECRET PG_EVENTS_SECRET
    STAGE=prod ./infra/scripts/put-parameters.sh
+   aws ssm get-parameters-by-path --path /checkout/prod/pg --query "Parameters[].Name"   # 5 nombres
    ```
 
 4. **Variables de GitHub** (*Settings → Secrets and variables → Actions*):
