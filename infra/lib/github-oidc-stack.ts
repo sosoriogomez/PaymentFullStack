@@ -8,7 +8,10 @@ const GITHUB_OIDC_URL = 'https://token.actions.githubusercontent.com';
 const GITHUB_AUDIENCE = 'sts.amazonaws.com';
 
 export interface GithubOidcStackProps extends StackProps {
-  /** `owner/repository` allowed to deploy. */
+  /**
+   * Repository allowed to deploy, as it appears in the token subject: `owner@<owner-id>/repo@<repo-id>`
+   * (immutable subject, repositories created after 2026-07-15) or `owner/repo` (older ones).
+   */
   readonly repository: string;
   /** Only workflows running on this branch can assume the role. */
   readonly branch: string;
