@@ -146,7 +146,7 @@ npm run lint -w apps/api && npm run typecheck -w apps/api && npm run depcruise -
 | Proyecto | Qué prueba | Tests |
 |---|---|---|
 | unit | Dominio, casos de uso con *fakes*, adaptadores con `fetch` simulado | 335 |
-| integration | Repositorios, migraciones, unidad de trabajo, carreras reales y handlers de Lambda contra PostgreSQL | 39 |
+| integration | Repositorios, migraciones, unidad de trabajo, carreras reales y handlers de Lambda contra PostgreSQL | 41 |
 | e2e | La app completa por HTTP (supertest) con la pasarela simulada | 100 |
 
 Cobertura de la corrida completa (umbral de CI: 85 %):

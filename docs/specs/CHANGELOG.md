@@ -87,6 +87,14 @@ Criterio: se conserva todo lo que mejora la app que pide el enunciado (robustez 
 
 ---
 
+## Operación
+
+| ID | Dónde | Cambio | Motivo |
+|---|---|---|---|
+| O-01 | BE-02 | Migración de datos `RestockCatalog`: suma 5 unidades al stock de todos los productos, incluido el que estaba agotado. En una base nueva corre antes del seed y no cambia nada, así que el seed sigue siendo el catálogo inicial | Decisión del autor: reabastecer el catálogo de producción. La base es privada, así que la migración es la forma versionada de cambiar sus datos |
+
+---
+
 ## Verificaciones externas realizadas
 
 - La creación de transacciones usa la **llave privada** y exige `acceptance_token` + `accept_personal_auth` (política de privacidad y tratamiento de datos personales), como estaba en el spec.
