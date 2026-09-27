@@ -71,15 +71,17 @@ Limitación conocida: los contadores viven en la memoria de cada instancia de La
 Estas herramientas necesitan la URL pública, así que se corren después de cada deploy a producción. `infra/scripts/smoke-test.sh` ya comprueba en el pipeline que las cabeceras de seguridad están presentes y que API Gateway rechaza las llamadas directas.
 
 1. [Mozilla Observatory](https://observatory.mozilla.org/) sobre la URL de CloudFront. Objetivo: A o superior.
-2. [SSL Labs](https://www.ssllabs.com/ssltest/) sobre el dominio de CloudFront. Objetivo: A.
+2. [SSL Labs](https://www.ssllabs.com/ssltest/) sobre el dominio de CloudFront. Objetivo: A (ver la limitación abajo).
 3. [securityheaders.com](https://securityheaders.com/) sobre la URL de CloudFront. Objetivo: A.
-4. Guardar las capturas en `docs/security/` y completar la tabla.
+4. Anotar en la tabla el resultado y el enlace al reporte público.
 
 | Herramienta | Resultado | Fecha |
 |---|---|---|
-| Mozilla Observatory | Pendiente del primer deploy | — |
-| SSL Labs | Pendiente del primer deploy | — |
-| securityheaders.com | Pendiente del primer deploy | — |
+| Mozilla Observatory | **A+**: 125 puntos, 12 de 12 pruebas ([reporte](https://developer.mozilla.org/en-US/observatory/analyze?host=dpkj1nr1durw5.cloudfront.net)) | 2026-09-27 |
+| SSL Labs | **B** ([reporte](https://www.ssllabs.com/ssltest/analyze.html?d=dpkj1nr1durw5.cloudfront.net)). Hay TLS 1.2 y 1.3 con *forward secrecy*, HSTS y un certificado válido; la nota baja porque el dominio también acepta TLS 1.0 y 1.1 | 2026-09-27 |
+| securityheaders.com | Pendiente: el sitio bloquea clientes automatizados y se corre desde un navegador. Las seis cabeceras que evalúa (CSP, HSTS, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy` y `Permissions-Policy`) están en la respuesta, y `smoke-test.sh` comprueba cinco de ellas en cada deploy | — |
+
+**Por qué SSL Labs da B.** Con el certificado por defecto de `*.cloudfront.net`, CloudFront fija la política de seguridad `TLSv1` y no permite cambiarla (la supresión de `cdk-nag` en `web-stack.ts` lo documenta). Para llegar a A hace falta un dominio propio con certificado de ACM y la política `TLSv1.2_2021` en la distribución. La prueba no pide dominio propio, así que queda fuera del alcance.
 
 ## Secretos
 
