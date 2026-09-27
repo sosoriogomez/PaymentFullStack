@@ -47,6 +47,29 @@ describe('GithubOidcStack', () => {
     });
   });
 
+  it('should trust the immutable subject of repositories created after 2026-07-15', () => {
+    const immutable = new GithubOidcStack(new App(), 'OidcImmutable', {
+      repository: 'owner@123/repo@456',
+      branch: 'main',
+      stage: 'prod',
+      env: { account: '123456789012', region: 'us-east-1' },
+    });
+    Template.fromStack(immutable).hasResourceProperties('AWS::IAM::Role', {
+      AssumeRolePolicyDocument: {
+        Statement: [
+          Match.objectLike({
+            Condition: {
+              StringEquals: Match.objectLike({
+                'token.actions.githubusercontent.com:sub':
+                  'repo:owner@123/repo@456:ref:refs/heads/main',
+              }),
+            },
+          }),
+        ],
+      },
+    });
+  });
+
   it('should print the role ARN that GitHub needs', () => {
     template.hasOutput('DeployRoleArn', {
       Value: { 'Fn::GetAtt': [Match.stringLikeRegexp('^DeployRole'), 'Arn'] },

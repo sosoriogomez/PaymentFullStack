@@ -49,6 +49,7 @@ Severidad:
 | I-20 | FE-02 | No se pudo verificar que la sandbox permita CORS en `/tokens/cards` desde el navegador. Se agrega un **spike** al inicio de FE-02 y un plan B (proxy en el backend que no persiste ni loguea) que no cambia el puerto `CardTokenizer` |
 | I-21 | CL-05, BE-11 | Detectado al implementar: la política administrada `AllViewerExceptHostHeader` no reenvía encabezados de CloudFront, así que `CloudFront-Viewer-Address` no llegaba a la API y el límite por IP habría contado por *edge location*. Se reemplaza por una política propia con allowlist (encabezados que la API lee + `CloudFront-Viewer-Address`, sin `Host`) |
 | I-22 | CL-07 | Detectado al revisar el primer deploy: con `environment: production` en el job, GitHub firma el token OIDC con `sub = repo:<owner>/<repo>:environment:production`, y el rol solo confía en `ref:refs/heads/main`, así que el deploy habría fallado al asumirlo. Se quita el `environment` del job y el stack OIDC imprime el ARN del rol como output |
+| I-23 | CL-07 | Detectado en el primer deploy real (`Not authorized to perform sts:AssumeRoleWithWebIdentity`): los repositorios creados desde el 15-07-2026 reciben un `sub` inmutable, `repo:<owner>@<owner-id>/<repo>@<repo-id>:ref:refs/heads/main`, y el rol esperaba `repo:<owner>/<repo>:…`. El contexto `repository` del stack OIDC acepta ese formato (y valida los dos) y el README explica cómo obtener los IDs. Además, un nombre de repositorio reciclado ya no puede suplantar al original |
 
 ## Menores
 
