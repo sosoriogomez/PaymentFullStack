@@ -107,7 +107,7 @@ function handler(event) {
 ### 3.1 Red (`NetworkStack`)
 
 - `ec2.Vpc` con `maxAzs: 2`, subnets `PUBLIC` (NAT), `PRIVATE_WITH_EGRESS` (Lambdas) y `PRIVATE_ISOLATED` (RDS).
-- `natGatewayProvider: NatProvider.instanceV2({ instanceType: t4g.nano, machineImage: Amazon Linux 2023 arm64, defaultAllowedTraffic: OUTBOUND_ONLY })`, `natGateways: 1`.
+- `natGatewayProvider: NatProvider.instanceV2({ instanceType: t4g.micro, machineImage: Amazon Linux 2023 arm64, defaultAllowedTraffic: OUTBOUND_ONLY })`, `natGateways: 1`.
 - `LambdaSg` sin inbound; `DbSg` con inbound 5432 **solo** desde `LambdaSg`.
 - Flow Logs a CloudWatch con 7 días de retención (o supresión `VPC7` justificada por costo).
 
@@ -203,7 +203,7 @@ Se adelanta a la fase 1 (spec overview) para que todo PR posterior pase por los 
 
 ### CL-01 · Red — `feat/cl-01-network`
 
-§3.1. **Tests:** existe un solo NAT (instancia `t4g.nano`); `DbSg` admite 5432 solo desde `LambdaSg`; no hay ingress `0.0.0.0/0` en ningún security group.
+§3.1. **Tests:** existe un solo NAT (instancia `t4g.micro`); `DbSg` admite 5432 solo desde `LambdaSg`; no hay ingress `0.0.0.0/0` en ningún security group.
 
 ### CL-02 · Base de datos — `feat/cl-02-database`
 
@@ -264,7 +264,7 @@ Observatory, SSL Labs y securityheaders.com sobre la URL de CloudFront con captu
 | Recurso | USD/mes aprox. |
 |---|---|
 | RDS `db.t4g.micro` + 20 GB | 12–15 (o créditos/free tier) |
-| NAT instance `t4g.nano` | ~3 |
+| NAT instance `t4g.micro` | ~6 |
 | Secrets Manager (2 secretos) | ~0.80 |
 | Lambda, API Gateway, CloudFront, S3, SSM, Scheduler | ~0 al volumen de la prueba |
 
