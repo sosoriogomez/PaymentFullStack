@@ -89,7 +89,6 @@ forbidden: [
 | Repository | `ProductRepository`, `CustomerRepository`, `TransactionRepository`, `DeliveryRepository` | Colecciones de dominio, sin detalles de SQL |
 | Unit of Work | `UnitOfWork.run(work)` sobre `QueryRunner` | Finalizar = 3 escrituras atómicas; rollback si el `Result` es `Err` |
 | Strategy | `FeePolicy` → `FlatFeePolicy` | Cambiar el cálculo de envío sin tocar casos de uso |
-| Decorator | `CachedAcceptanceProvider` envuelve el puerto de la pasarela | Caché de 5 min sin ensuciar el adaptador HTTP |
 | Anti-Corruption Layer | `gateway.schemas.ts` (zod) + `gateway.mapper.ts` | El modelo de la pasarela (snake_case, estados, extras) no se filtra al dominio |
 | Data Mapper | `*.mapper.ts` ORM ⇄ dominio ⇄ DTO | Las entidades ORM nunca salen de `infrastructure/` |
 | Template de handler | `bootstrap/create-app.ts` compartido por `main.ts`, `lambda.ts` y los tests e2e | La app es idéntica en local, en Lambda y en tests |
@@ -305,7 +304,7 @@ export const priceOrder = (product: Product, quantity: Quantity, fees: FeePolicy
    ```
    `attempt` traduce: `AbortError`/`TimeoutError` → `TIMEOUT`; `TypeError` de red → `NETWORK`; 5xx → `HTTP_5XX`; 4xx → `GATEWAY_REJECTED` con el motivo del body; JSON inválido o schema zod fallido → `GATEWAY_UNAVAILABLE` (se loguea el problema, no el body).
 5. `integrity-signature.ts` y `event-checksum.ts` (funciones puras sobre `node:crypto`; `timingSafeEqual` con guarda de longitud).
-6. `CachedAcceptanceProvider` (decorador con TTL y `Clock` inyectado) + `GetAcceptance` + `GET /api/v1/checkout/acceptance`.
+6. `GetAcceptance` + `GET /api/v1/checkout/acceptance`, sin caché: cada token de aceptación es de un solo uso (I-25).
 7. `FakePaymentGateway` en `test/fakes` con escenarios `approved`, `declined`, `timeout`, `rejected`, `amountMismatch` y contadores de llamadas.
 
 **Tests:** los de aceptación del spec (fetch mockeado) + deadline con fake timers + vector conocido de firma y de checksum.

@@ -29,7 +29,7 @@ export class CheckoutController {
     };
   }
 
-  /** Acceptance tokens and permalinks of the terms (cached 5 minutes behind the port). */
+  /** Acceptance tokens and permalinks of the terms, fresh on every call: the tokens are single use. */
   @ApiOperation({ summary: 'Contracts to accept before paying, with links to read them' })
   @ApiProblems(502, 503)
   @Get('acceptance')
