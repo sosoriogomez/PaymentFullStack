@@ -66,6 +66,9 @@ describe('CardFields', () => {
     const { user, field } = setup();
     const input = field(texts.number) as HTMLInputElement;
     await user.type(input, '42424242');
+    // Each keystroke re-places the caret on the next frame: let the last one land first, or it
+    // moves the caret back to the end after we place it (it happened on a slow CI runner).
+    await new Promise(requestAnimationFrame);
 
     input.setSelectionRange(2, 2);
     await user.keyboard('9');
