@@ -124,7 +124,7 @@ npm run lint && npm run typecheck
 | Workspace | Tests | Statements | Branches | Functions | Lines |
 |---|---|---|---|---|---|
 | API ([detalle](apps/api/README.md#pruebas-y-cobertura)) | 474 (335 unit, 39 integración, 100 e2e) | 99.08 % | 95.37 % | 98.66 % | 99.55 % |
-| SPA ([detalle](apps/web/README.md#pruebas-y-cobertura)) | 326 | 97.37 % | 94.40 % | 98.37 % | 99.70 % |
+| SPA ([detalle](apps/web/README.md#pruebas-y-cobertura)) | 327 | 97.50 % | 94.24 % | 98.18 % | 99.72 % |
 | Infraestructura ([detalle](infra/README.md#pruebas)) | 54 | 100 % | 88.23 % | 100 % | 100 % |
 
 El CI ([`ci.yml`](.github/workflows/ci.yml)) corre en cada PR, en cada push a `main` y a mano desde la pestaña *Actions*:
