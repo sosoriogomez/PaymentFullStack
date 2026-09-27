@@ -25,9 +25,10 @@ export class NetworkStack extends Stack {
     super(scope, id, props);
     const { config } = props;
 
-    // NAT instance instead of NAT Gateway: ~USD 3/month instead of ~USD 32 (ADR-004).
+    // NAT instance instead of NAT Gateway: ~USD 6/month instead of ~USD 32 (ADR-004). t4g.micro is
+    // the smallest Graviton type AWS Free plan accounts may launch; t4g.nano is refused (I-24).
     const nat = ec2.NatProvider.instanceV2({
-      instanceType: new ec2.InstanceType('t4g.nano'),
+      instanceType: new ec2.InstanceType('t4g.micro'),
       machineImage: ec2.MachineImage.latestAmazonLinux2023({
         cpuType: ec2.AmazonLinuxCpuType.ARM_64,
       }),
@@ -88,7 +89,7 @@ export class NetworkStack extends Stack {
     NagSuppressions.addStackSuppressions(this, [
       {
         id: 'AwsSolutions-EC28',
-        reason: 'Detailed monitoring on the t4g.nano NAT instance is not worth its cost here.',
+        reason: 'Detailed monitoring on the t4g.micro NAT instance is not worth its cost here.',
       },
       {
         id: 'AwsSolutions-EC29',
