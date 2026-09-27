@@ -20,7 +20,6 @@ const settings: PaymentGatewaySettings = {
   getTimeoutMs: 4000,
   getMaxRetries: 2,
   deadlineMs: 12000,
-  acceptanceCacheTtlSeconds: 300,
 };
 
 const charge: CardChargeRequest = {

@@ -344,7 +344,7 @@ Prefijo global: `/api`, versionado por URI: `/api/v1/...`. JSON `camelCase`. Err
 | 3 | GET | `/api/v1/products/:id` | stock | Detalle (`ParseUUIDPipe`) |
 | 4 | GET | `/api/v1/products/:id/stock` | stock | `{ productId, available, updatedAt }` — recurso **stock** explícito, liviano, usado en el paso 5 (I-07) |
 | 5 | GET | `/api/v1/checkout/quote?productId&quantity` | pricing | Desglose: producto, base fee, delivery fee, total |
-| 6 | GET | `/api/v1/checkout/acceptance` | pasarela | Tokens de aceptación + permalinks de términos (cache 5 min) |
+| 6 | GET | `/api/v1/checkout/acceptance` | pasarela | Tokens de aceptación + permalinks de términos, nuevos en cada llamada porque son de un solo uso (I-25) |
 | 7 | POST | `/api/v1/customers` | customers | Upsert por email → 201 (nuevo, con `Location`) / 200 (existente) |
 | 8 | GET | `/api/v1/customers/:id` | customers | Datos **enmascarados** (`j***@mail.com`, `***4567`) |
 | 9 | POST | `/api/v1/transactions` | transactions | Crea PENDING + cobra. Header **`Idempotency-Key`** obligatorio. 201 nuevo / 200 replay |
@@ -536,7 +536,6 @@ PG_POST_TIMEOUT_MS=8000
 PG_GET_TIMEOUT_MS=4000
 PG_GET_MAX_RETRIES=2
 PG_DEADLINE_MS=12000
-ACCEPTANCE_CACHE_TTL_SECONDS=300
 BASE_FEE_IN_CENTS=300000
 DELIVERY_FEE_IN_CENTS=1000000
 CURRENCY=COP
@@ -622,7 +621,7 @@ Cada feature = **una rama `feat/be-XX-...` creada desde `main` + un PR hacia `ma
 ### BE-06 · Adaptador de la pasarela + acceptance
 
 - `PaymentGatewayPort`, `HttpPaymentGatewayAdapter`, `integrity-signature.ts`, `event-checksum.ts`, schemas zod de respuestas.
-- `GetAcceptance` + `GET /api/v1/checkout/acceptance` con caché en memoria (TTL 5 min) implementada como **decorador** del puerto (`CachedAcceptanceProvider`).
+- `GetAcceptance` + `GET /api/v1/checkout/acceptance`, sin caché: cada token de aceptación trae su propio `jit` y lo consume la transacción que lo usa, así que cada checkout pide uno nuevo (I-25).
 - Timeouts, reintentos solo GET y deadline total según §6.3 (I-02).
 - **Spike** `scripts/pg-smoke.ts` contra la sandbox (§6.3) → *fixtures* reales para los tests y confirmación del formato de teléfonos (I-19).
 - `FakePaymentGateway` en `test/fakes` configurable (APPROVED/DECLINED/timeout/rejected/amount-mismatch).

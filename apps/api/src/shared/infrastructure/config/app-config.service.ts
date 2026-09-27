@@ -36,7 +36,6 @@ export interface PaymentGatewaySettings {
   readonly getTimeoutMs: number;
   readonly getMaxRetries: number;
   readonly deadlineMs: number;
-  readonly acceptanceCacheTtlSeconds: number;
 }
 
 export interface PricingSettings {
@@ -89,7 +88,6 @@ const paymentGatewaySettings = (env: Env): PaymentGatewaySettings => ({
   getTimeoutMs: env.PG_GET_TIMEOUT_MS,
   getMaxRetries: env.PG_GET_MAX_RETRIES,
   deadlineMs: env.PG_DEADLINE_MS,
-  acceptanceCacheTtlSeconds: env.ACCEPTANCE_CACHE_TTL_SECONDS,
 });
 
 const pricingSettings = (env: Env): PricingSettings => ({
