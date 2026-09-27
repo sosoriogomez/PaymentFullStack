@@ -40,21 +40,21 @@ Las decisiones de fondo están en [ADR-004](../docs/adr/004-lambda-postgres-clou
 
 Requisitos: una cuenta de AWS, AWS CLI con credenciales de administrador (solo para los pasos 1 a 3), Node 24 y `jq`.
 
-1. **Bootstrap de CDK** en `us-east-1`, una vez por cuenta:
+1. **Bootstrap de CDK** en `us-east-1`, una vez por cuenta. Se corre desde la **raíz** del repositorio: dentro de `infra/`, CDK intentaría sintetizar primero la app, que necesita el contexto `pgHost` y el bundle de la Lambda.
 
    ```bash
-   cd infra && npx cdk bootstrap aws://$(aws sts get-caller-identity --query Account --output text)/us-east-1
+   npx cdk bootstrap aws://$(aws sts get-caller-identity --query Account --output text)/us-east-1
    ```
 
 2. **Rol de despliegue para GitHub (OIDC).** Solo confía en la rama `main` del repositorio indicado. Una cuenta admite un solo proveedor OIDC de GitHub; si `aws iam list-open-id-connect-providers` ya muestra `token.actions.githubusercontent.com`, el stack falla al crearlo de nuevo.
 
    ```bash
-   npx cdk deploy -a "npx tsx bin/bootstrap-oidc.ts" -c repository=<owner>/<repo>
+   cd infra && npx cdk deploy -a "npx tsx bin/bootstrap-oidc.ts" -c repository=<owner>/<repo>
    ```
 
    El output `DeployRoleArn` es el valor de la variable `AWS_DEPLOY_ROLE_ARN` del paso 4. El job de deploy no declara `environment:`: con uno, GitHub firmaría el token con `sub = repo:…:environment:<nombre>` y el rol lo rechazaría (I-22).
 
-3. **Llaves de la pasarela en SSM** (`SecureString`, bajo `/checkout/prod/`). Desde la raíz del repositorio. `read -rs` pide cada secreto sin mostrarlo ni dejarlo en el historial, y el script lo pasa a AWS por stdin:
+3. **Llaves de la pasarela en SSM** (`SecureString`, bajo `/checkout/prod/`). Desde la raíz del repositorio (`cd ..` si vienes del paso 2). `read -rs` pide cada secreto sin mostrarlo ni dejarlo en el historial, y el script lo pasa a AWS por stdin:
 
    ```bash
    read -r PG_BASE_URL; read -r PG_PUBLIC_KEY
@@ -95,6 +95,7 @@ Como el código nuevo ya está publicado cuando corren las migraciones, estas de
 ## Destruir
 
 ```bash
+npm run build:lambda -w apps/api                 # la app necesita el bundle para sintetizar
 cd infra && npx cdk destroy --all -c pgHost=<host>
 ```
 
