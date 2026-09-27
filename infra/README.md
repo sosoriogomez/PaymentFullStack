@@ -28,7 +28,7 @@ flowchart LR
 
 | Stack | Contenido |
 |---|---|
-| `checkout-prod-network` | VPC con subredes públicas, privadas con salida y aisladas en 2 AZ; NAT instance `t4g.nano`; security groups; *flow logs* |
+| `checkout-prod-network` | VPC con subredes públicas, privadas con salida y aisladas en 2 AZ; NAT instance `t4g.micro`; security groups; *flow logs* |
 | `checkout-prod-database` | RDS PostgreSQL 16 `t4g.micro` privada, cifrada y con TLS obligatorio; credenciales en Secrets Manager |
 | `checkout-prod-api` | Lambdas `api`, `migrate` y `reconcile` (Node 24, arm64) desde `apps/api/dist-lambda`; HTTP API con throttling y *access logs*; schedule de reconciliación; secreto `X-Origin-Verify` |
 | `checkout-prod-web` | Bucket S3 privado (OAC); CloudFront con la función de rutas de la SPA, `/api/*` sin caché y políticas de cabeceras para la SPA, la API y Swagger |
@@ -111,7 +111,7 @@ Aproximados por mes, durante la evaluación:
 | Recurso | Costo |
 |---|---|
 | RDS `db.t4g.micro` + 20 GB | ~USD 12–15 (cubierto por la capa gratuita o los créditos, si la cuenta los tiene) |
-| NAT instance `t4g.nano` | ~USD 3 (un NAT Gateway costaría ~USD 32) |
+| NAT instance `t4g.micro` | ~USD 6 (un NAT Gateway costaría ~USD 32; `t4g.nano` costaría ~USD 3, pero las cuentas en el plan gratuito de AWS no pueden lanzarla) |
 | Secrets Manager (DB y origen) | ~USD 0.80 |
 | Lambda, API Gateway, CloudFront, S3, SSM, EventBridge Scheduler | ~USD 0 al volumen de la prueba |
 

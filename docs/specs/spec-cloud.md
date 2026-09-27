@@ -26,7 +26,7 @@ flowchart LR
     L -->|5432 TLS| RDS[(RDS PostgreSQL 16<br/>t4g.micro · privado)]
     M[Lambda migrate] --> RDS
     R[Lambda reconcile] --> RDS
-    L -->|salida internet| NAT[NAT instance t4g.nano]
+    L -->|salida internet| NAT[NAT instance t4g.micro]
     R -->|salida internet| NAT
   end
   SCH[EventBridge Scheduler<br/>cada 5 min] --> R
@@ -42,7 +42,7 @@ Decisiones (ADR-004):
 | **Mismo origen**: CloudFront sirve `/*` (S3) y `/api/*` (API Gateway) | Sin CORS, una sola política de headers, un único link entregable |
 | **Lambda + API Gateway HTTP API** | Sin costo fijo, HTTPS gestionado, escala a cero |
 | **RDS PostgreSQL privado** (subnets aisladas) | Nunca expuesto a internet |
-| **NAT instance t4g.nano** (`NatProvider.instanceV2`) en lugar de NAT Gateway | La Lambda en VPC necesita salida a la pasarela; NAT Gateway cuesta ~USD 32/mes, la instancia ~USD 3/mes |
+| **NAT instance t4g.micro** (`NatProvider.instanceV2`) en lugar de NAT Gateway | La Lambda en VPC necesita salida a la pasarela; NAT Gateway cuesta ~USD 32/mes, la instancia ~USD 6/mes. `t4g.nano` costaría ~USD 3, pero el plan gratuito de AWS no la admite (I-24) |
 | **CloudFront Function** para el fallback SPA (no `customErrorResponses`) | Los error responses aplican a toda la distribución y convertirían los 404/403 de la API en `index.html` |
 | **Header secreto `X-Origin-Verify`** CloudFront → API | Evita que se salte CloudFront (y sus headers/rate limits) llamando directo a `execute-api` |
 | **Throttling de API Gateway** (25 rps / burst 50) + pool `max: 2`; reserved concurrency **opcional** por stage (C-02) | Protege las conexiones de una RDS micro sin pagar RDS Proxy. No se reserva concurrencia por defecto: en cuentas nuevas la cuota es 10 y AWS exige dejar ≥ 10 sin reservar, así que `reservedConcurrentExecutions: 10` hace fallar el deploy |
@@ -117,7 +117,7 @@ Cada feature = **rama `feat/cl-XX-...` desde `main` + PR hacia `main`**. DoD com
 ### CL-01 · Red
 
 - VPC con 2 AZ: subnets `PUBLIC` (NAT), `PRIVATE_WITH_EGRESS` (Lambdas), `PRIVATE_ISOLATED` (RDS).
-- `natGateways: 1` con `NatProvider.instanceV2({ instanceType: t4g.nano })`.
+- `natGateways: 1` con `NatProvider.instanceV2({ instanceType: t4g.micro })`.
 - Security groups: `LambdaSg` (sin inbound) y `DbSg` (inbound 5432 **solo** desde `LambdaSg`).
 - VPC Flow Logs a CloudWatch con retención corta (7 días) — o supresión justificada por costo.
 
@@ -209,7 +209,7 @@ Costo estimado del periodo de evaluación (aprox., depende de si la cuenta tiene
 | Recurso | Aprox. mensual |
 |---|---|
 | RDS db.t4g.micro + 20 GB | ~USD 12–15 (cubierto por free tier/créditos si aplica) |
-| NAT instance t4g.nano | ~USD 3 |
+| NAT instance t4g.micro | ~USD 6 |
 | Secrets Manager (2 secretos: DB y origen) | ~USD 0.80 |
 | Lambda, API Gateway, CloudFront, S3, SSM, EventBridge Scheduler | ~USD 0 al volumen de la prueba |
 
