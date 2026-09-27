@@ -21,11 +21,11 @@ describe('NetworkStack', () => {
     });
   });
 
-  it('should use a single t4g.nano NAT instance instead of a NAT gateway', () => {
+  it('should use a single Free Tier eligible NAT instance instead of a NAT gateway', () => {
     template.resourceCountIs('AWS::EC2::NatGateway', 0);
     template.resourceCountIs('AWS::EC2::Instance', 1);
     template.hasResourceProperties('AWS::EC2::Instance', {
-      InstanceType: 't4g.nano',
+      InstanceType: 't4g.micro',
       SourceDestCheck: false,
     });
   });
