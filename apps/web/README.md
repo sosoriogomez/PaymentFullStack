@@ -115,8 +115,8 @@ npm run lint -w apps/web && npm run stylelint -w apps/web && npm run typecheck -
 | Componentes | Interacción real con Testing Library y `user-event`, consultas por rol y etiqueta |
 | Flujo completo | [`test/integration/checkout-flow.test.tsx`](test/integration/checkout-flow.test.tsx): pasos 1 → 5 aprobado y rechazado con el store real y solo la API y el tokenizador falsos |
 
-**326 tests en 45 suites.** Cobertura:
+**327 tests en 46 suites.** Cobertura:
 
 | Statements | Branches | Functions | Lines |
 |---|---|---|---|
-| 97.37 % | 94.40 % | 98.37 % | 99.70 % |
+| 97.50 % | 94.24 % | 98.18 % | 99.72 % |

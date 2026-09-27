@@ -1,5 +1,7 @@
 // global.css va primero: declara el orden de las capas antes que cualquier CSS Module.
 import './styles/global.css';
+// Antes que cualquier esquema de zod (env se valida al importarse).
+import './shared/config/zod-config';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
