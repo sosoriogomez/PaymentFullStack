@@ -132,7 +132,7 @@ El CI ([`ci.yml`](.github/workflows/ci.yml)) corre en cada PR, en cada push a `m
 - lint, typecheck y `dependency-cruiser` (verifica las capas de la arquitectura hexagonal);
 - los tests con un umbral de cobertura del 85 %;
 - el build de la Lambda y el synth de CDK con `cdk-nag`;
-- `npm audit`;
+- `npm audit` de las dependencias que llegan a producción (API y web);
 - una búsqueda de patrones de llaves de la pasarela en el repositorio.
 
 ## Documentación

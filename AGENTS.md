@@ -137,6 +137,7 @@ No se rompen. Si un cambio lo exige, primero se escribe un ADR.
 - **Sin nombres comerciales.** No escribas el nombre de la pasarela ni el de la empresa evaluadora, ni sus URLs, en el código, los commits o la documentación. Se dice "payment gateway" o "PG", y la URL llega por configuración.
 - **Logs.** Si un dato sensible nuevo puede aparecer en una petición o en un log, agrégalo a `REDACTED_PATHS` en `apps/api/src/shared/infrastructure/logging/logger.config.ts`.
 - **Datos personales.** Las respuestas enmascaran el email y el teléfono (`apps/api/src/shared/infrastructure/http/masking.ts`).
+- **Dependencias.** El job `audit` falla ante una vulnerabilidad alta en las dependencias de producción de la API y la web. `infra` se revisa a mano con `npm audit --omit=dev --workspace infra`, porque `aws-cdk-lib` solo corre al desplegar.
 
 ## 10. Git y pull requests
 
