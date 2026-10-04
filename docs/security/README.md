@@ -92,4 +92,6 @@ Estas herramientas necesitan la URL pública, así que se corren después de cad
 
 ## Dependencias
 
-`npm audit --omit=dev --audit-level=high` corre en CI en cada PR y en cada push a `main` (job `audit`): una vulnerabilidad alta en una dependencia de producción hace fallar el CI. Las versiones están fijadas en `package-lock.json`.
+`npm audit --omit=dev --audit-level=high --workspace apps/api --workspace apps/web` corre en CI en cada PR y en cada push a `main` (job `audit`): una vulnerabilidad alta en una dependencia que llega a producción (el bundle de la Lambda o la SPA) hace fallar el CI. Las versiones están fijadas en `package-lock.json`.
+
+`infra` queda fuera del job porque `aws-cdk-lib` solo se ejecuta al sintetizar y desplegar, nunca en producción. Además, sus dependencias empaquetadas no se pueden actualizar por separado, así que un aviso en una de ellas bloquearía todos los PRs hasta que AWS publique una versión nueva. Se revisa a mano con `npm audit --omit=dev --workspace infra` y se actualiza `aws-cdk-lib` cuando sale el arreglo.

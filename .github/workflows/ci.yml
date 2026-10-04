@@ -132,5 +132,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+      # Only what runs in production: the Lambda bundle (apps/api) and the SPA (apps/web).
+      # infra (aws-cdk-lib) only runs at synth and deploy time; audit it by hand with
+      # `npm audit --omit=dev --workspace infra`.
       - name: Production dependencies without high vulnerabilities
-        run: npm audit --omit=dev --audit-level=high
+        run: npm audit --omit=dev --audit-level=high --workspace apps/api --workspace apps/web
