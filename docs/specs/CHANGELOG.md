@@ -92,6 +92,7 @@ Criterio: se conserva todo lo que mejora la app que pide el enunciado (robustez 
 | ID | Dónde | Cambio | Motivo |
 |---|---|---|---|
 | O-01 | BE-02 | Migración de datos `RestockCatalog`: suma 5 unidades al stock de todos los productos, incluido el que estaba agotado. En una base nueva corre antes del seed y no cambia nada, así que el seed sigue siendo el catálogo inicial | Decisión del autor: reabastecer el catálogo de producción. La base es privada, así que la migración es la forma versionada de cambiar sus datos |
+| O-02 | CL-07, CL-09 | `deploy.yml` deja de correr en cada push a `main` y queda solo a mano (`workflow_dispatch`). La infraestructura de AWS se eliminó, incluidos el *snapshot* final de RDS, el bucket web, los parámetros de SSM y el stack de OIDC | Decisión del autor: retirar la demo pública al terminar la evaluación, sin que un push a `main` la vuelva a crear |
 
 ---
 

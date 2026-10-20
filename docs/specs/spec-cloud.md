@@ -185,7 +185,7 @@ Branch protection en `main`: PR obligatorio + checks en verde.
 
 ### CL-07 · CD (despliegue continuo)
 
-`deploy.yml` en push a `main` (y `workflow_dispatch`). Mientras la variable de repositorio `AWS_DEPLOY_ROLE_ARN` no exista, el job se omite en vez de fallar. El job no declara `environment:`, para que el `sub` del token OIDC sea `ref:refs/heads/main` (I-22):
+`deploy.yml` a mano (`workflow_dispatch`). Durante la evaluación corría también en cada push a `main`; dejó de hacerlo al retirar la demo pública (O-02). Mientras la variable de repositorio `AWS_DEPLOY_ROLE_ARN` no exista, el job se omite en vez de fallar. El job no declara `environment:`, para que el `sub` del token OIDC sea `ref:refs/heads/main` (I-22):
 
 0. **Prerrequisito manual único (I-17):** `cdk bootstrap` y `cdk deploy -a "npx tsx bin/bootstrap-oidc.ts"` → `GithubOidcStack` crea el OIDC provider de GitHub y el rol de despliegue. Trust policy: `token.actions.githubusercontent.com:aud = sts.amazonaws.com` y `sub = repo:<owner>@<owner-id>/<repo>@<repo-id>:ref:refs/heads/main`, el formato inmutable que GitHub usa en los repositorios creados desde el 15-07-2026 (I-23); los anteriores usan `repo:<owner>/<repo>:ref:refs/heads/main`. Permisos: solo `sts:AssumeRole` sobre `arn:aws:iam::<account>:role/cdk-*` (los roles de bootstrap hacen el resto), más `s3:*` sobre el bucket web, `cloudfront:CreateInvalidation` y `lambda:InvokeFunction` sobre `MigrateFunction`.
 1. `aws-actions/configure-aws-credentials` con **OIDC** asumiendo ese rol.

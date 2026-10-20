@@ -78,7 +78,7 @@ Requisitos: una cuenta de AWS, AWS CLI con credenciales de administrador (solo p
 
    Deben ser variables del repositorio, no de un *environment*, porque la condición del job solo ve esas. Mientras `AWS_DEPLOY_ROLE_ARN` no exista, el deploy se omite y `main` queda en verde.
 
-5. **Push a `main`.** El workflow [`deploy.yml`](../.github/workflows/deploy.yml) hace, en orden:
+5. **Correr el deploy** desde *Actions → deploy → Run workflow*, sobre `main`. Un push no lo lanza: el workflow [`deploy.yml`](../.github/workflows/deploy.yml) es solo manual desde que se retiró la demo pública. Hace, en orden:
    1. Construye la Lambda: `tsc` y luego esbuild.
    2. Corre `cdk deploy --all`.
    3. Ejecuta las migraciones y el seed a través de la Lambda `migrate`, porque la base es privada.
@@ -97,12 +97,20 @@ Como el código nuevo ya está publicado cuando corren las migraciones, estas de
 
 ## Destruir
 
+Así se retiró la demo pública al terminar la evaluación.
+
 ```bash
 npm run build:lambda -w apps/api                 # la app necesita el bundle para sintetizar
 cd infra && npx cdk destroy --all -c pgHost=<host>
+aws cloudformation delete-stack --stack-name checkout-prod-github-oidc
 ```
 
-RDS deja un *snapshot* final y el bucket web se conserva (`RETAIN`); ambos se borran a mano. El stack de OIDC se destruye aparte, con el mismo `-a` del paso 2.
+Después quedan cuatro cosas que se borran a mano:
+
+- el *snapshot* final que RDS crea al borrar la base (`removalPolicy: SNAPSHOT`);
+- el bucket web, que se conserva (`RETAIN`) y hay que vaciar antes de borrarlo;
+- los parámetros de la pasarela en SSM, bajo `/checkout/prod/pg/`;
+- el bootstrap de CDK (`CDKToolkit`, con su bucket de assets), solo si ninguna otra app de la cuenta lo usa.
 
 ## Costos
 

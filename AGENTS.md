@@ -144,7 +144,7 @@ No se rompen. Si un cambio lo exige, primero se escribe un ADR.
 - **Commits.** Siguen Conventional Commits y los revisa commitlint (`commitlint.config.cjs`). Scopes permitidos: `api`, `web`, `infra`, `ci`, `specs`, `plans`, `docs`, `deps` y `repo`. Ejemplos: `feat(api): add inventory summary`, `fix(web): keep the quantity within stock`, `docs: record a new ADR`.
 - **Hooks.** Husky corre commitlint y lint-staged (prettier) en cada commit. Los `.md` no pasan por prettier: se escriben a mano.
 - **Un PR por cambio**, con la plantilla `.github/pull_request_template.md`. Se integra a `main` solo con el CI en verde.
-- **`main` es producción.** Cada push a `main` despliega en AWS (`.github/workflows/deploy.yml`) y corre pruebas de humo contra la URL pública.
+- **El deploy es manual.** `.github/workflows/deploy.yml` despliega en AWS y corre pruebas de humo solo cuando se lanza a mano desde *Actions*. La demo pública se retiró al terminar la evaluación, así que un push a `main` no despliega nada.
 - **Decisiones y specs.** Una decisión de arquitectura nueva se documenta como ADR en `docs/adr/` (formato y lista en `docs/adr/README.md`). Un cambio al spec se registra en `docs/specs/CHANGELOG.md`.
 
 ## 11. Checklist antes de abrir un PR
