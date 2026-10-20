@@ -12,8 +12,8 @@ App de checkout para un producto pagado con tarjeta de crédito a través de una
 
 | | |
 |---|---|
-| App desplegada | https://dpkj1nr1durw5.cloudfront.net ([cómo desplegar](infra/README.md#desplegar-desde-cero)) |
-| Swagger (OpenAPI) | https://dpkj1nr1durw5.cloudfront.net/api/docs; en local, http://localhost:3000/api/docs |
+| App desplegada | Ya no está publicada: la infraestructura de AWS se eliminó al terminar la evaluación. Para volver a desplegarla, ver [cómo desplegar](infra/README.md#desplegar-desde-cero) |
+| Swagger (OpenAPI) | En local, http://localhost:3000/api/docs |
 | Colección de Postman | [`docs/postman/checkout-api.postman_collection.json`](docs/postman/checkout-api.postman_collection.json): pago aprobado y rechazado, idempotencia y errores |
 
 ## Flujo de negocio

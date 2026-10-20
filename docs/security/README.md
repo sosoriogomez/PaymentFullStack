@@ -68,6 +68,8 @@ Limitación conocida: los contadores viven en la memoria de cada instancia de La
 
 ## Verificación externa (tras el deploy)
 
+> La demo pública se retiró al terminar la evaluación. La tabla de abajo queda como registro de lo medido sobre la URL de CloudFront el 2026-09-27.
+
 Estas herramientas necesitan la URL pública, así que se corren después de cada deploy a producción. `infra/scripts/smoke-test.sh` ya comprueba en el pipeline que las cabeceras de seguridad están presentes y que API Gateway rechaza las llamadas directas.
 
 1. [Mozilla Observatory](https://observatory.mozilla.org/) sobre la URL de CloudFront. Objetivo: A o superior.
